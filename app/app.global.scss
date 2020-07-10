@@ -1,0 +1,11 @@
+@import "~@coreui/coreui/scss/coreui.scss";
+
+#title-bar {
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+  }
+
+#no-title-bar {
+  -webkit-user-select: true;
+  -webkit-app-region: no-drag;
+}

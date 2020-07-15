@@ -1,16 +1,13 @@
-import React, { lazy } from 'react'
+import React from 'react'
 import {
   CBadge,
   CButton,
   CCard,
   CCardBody,
   CCardHeader,
-  CCol,
   CDataTable,
   CForm,
   CProgress,
-  CRow,
-  CSwitch,
   CToast,
   CToaster,
   CToastBody,
@@ -18,6 +15,8 @@ import {
 } from '@coreui/react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+import axios from 'axios'
 
 const fields = [
   { key: 'Job', _style: { width: '15%'} },
@@ -46,11 +45,10 @@ const getStatusBadge = (status)=>{
 }
 
 const Dashboard = () => {
-  const [isConnected, setisConnected] = React.useState(false)
   const [jobList, setjobList] = React.useState([])
   const [jobProgress, setjobProgress] = React.useState(0)
-  const [jobType, setjobType] = React.useState()
-  const [jobPath, setjobPath] = React.useState()
+  const [jobType, setjobType] = React.useState('Nothing')
+  const [jobPath, setjobPath] = React.useState('nowhere')
 
   const [toasts, setToasts] = React.useState([
     {}
@@ -67,22 +65,102 @@ const Dashboard = () => {
   const addToast = (header, body) => {
     setToasts([
       ...toasts, 
-      { position:'top-right', autohide: true && 2000, closeButton:true, fade:true, header:header, body:body, show:true }
+      { autohide: true && 2000, closeButton:true, fade:true, header:header, body:body, show:true }
     ])
   }
 
   const get_jobs = async () => {
-    
+    const result = await axios(
+      'http://127.0.0.1:5555/api/tasks',
+    );
+
+    var taskList = []
+    var path = 'nowhere'
+    var type = 'No task running'
+
+    for (const [key, value] of Object.entries(result.data)) {
+      if (value.state === 'PENDING') {
+        var kwargs = value.kwargs.split("'")[3]
+      }
+      else {
+        var kwargs = value.kwargs
+
+        if (value.state === 'PROGRESS') {
+          var path = value.kwargs
+          if (value.name === 'tasks.align'){
+            var type = 'Alignment'
+          }
+          if (value.name === 'tasks.detect'){
+            var type = 'Detection'
+          }
+          if (value.name === 'tasks.mask'){
+            var type = 'Masking'
+          }
+        }  
+      }
+
+      if (value['state'] === 'PROGRESS') {
+        var progress = value.result
+        var truncated_kwargs = kwargs.replace(kwargs.split('\\').pop().split('/').pop(), '')
+      }
+      else {
+        var truncated_kwargs = kwargs
+      }
+      
+      if (value.name === 'tasks.align') {
+        var tmpDict = {"_id": key, "Job": 'Alignment', "Path": truncated_kwargs, 'Status': value.state}
+      }
+      else if (value.name === 'tasks.detect') {
+        var tmpDict = {"_id": key, "Job": 'Detection', "Path": truncated_kwargs, 'Status': value.state}
+      }
+      else if (value.name === 'tasks.mask') {
+        var tmpDict = {"_id": key, "Job": 'Mask', "Path": truncated_kwargs, 'Status': value.state}
+      }
+
+      taskList.push(tmpDict)
+    }
+
+    setjobList(taskList);
+    setjobType(type);
+    setjobPath(path);
+    setjobProgress(progress);
   };
 
   const handleRemoveClick = (index) => {
+    axios.post(
+      'http://127.0.0.1:5555/api/task/revoke/' + jobList[index]._id,
+      null, { params: { terminate : true }})
+    .then(function (response) {
+      let newJobs = jobList.slice()
+      newJobs.splice(index, 1)
+      setjobList([...newJobs])
+
+      setjobType('No task running');
+      setjobPath('nowhere');
+      setjobProgress(0);
+    })
+    .catch(function (error) {
+      addToast('Error', 'Unable to connect to server, try again. A bug report was sent.');
+    })
   }
+
+  React.useEffect(() => { 
+    get_jobs();
+
+    const interval = setInterval(() => {
+      get_jobs();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
 
   return (
     <>
       <CCard>
-        <CCardHeader>Job Status</CCardHeader>
+        <CCardHeader>
+          Job Status
+        </CCardHeader>
         <CCardBody >
           <CForm>
             <CDataTable

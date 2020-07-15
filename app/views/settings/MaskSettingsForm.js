@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite"
 import {
   CBadge,
   CButton,
+  CButtonGroup,
   CCard,
   CCardBody,
   CCardFooter,
@@ -31,14 +32,7 @@ const uuidv4 = require("uuid/v4")
 const channelFields = [
   { key: 'Type', _style: { width: '50%'} },
   {
-    key: 'Up',
-    label: '',
-    _style: { width: '10%' },
-    sorter: false,
-    filter: false
-  },
-  {
-    key: 'Down',
+    key: 'toggle',
     label: '',
     _style: { width: '10%' },
     sorter: false,
@@ -163,20 +157,17 @@ const MaskSettingsForm = (props) => {
                       </CBadge>
                     </td>
                   ),
-                  'Up':
+                  'toggle':
                     (item, index)=>{
                       return (
-                        <CButton onClick={()=>{handleUp(index)}} color="primary" size="sm" variant="outline" shape="square">
-                          <FontAwesomeIcon icon="arrow-up" />   Move Up
-                        </CButton>
-                    )
-                  },
-                  'Down':
-                    (item, index)=>{
-                      return (
-                        <CButton onClick={()=>{handleDown(index)}} color="primary" size="sm" variant="outline" shape="square">
-                          <FontAwesomeIcon icon="arrow-down" />   Move Down
-                        </CButton>
+                        <CButtonGroup>
+                          <CButton onClick={()=>{handleUp(index)}} color="dark" size="sm" variant="outline">
+                            <FontAwesomeIcon icon="arrow-up" />   Move Up
+                          </CButton>
+                          <CButton onClick={()=>{handleDown(index)}} color="dark" size="sm" variant="outline">
+                            <FontAwesomeIcon icon="arrow-down" />   Move Down
+                          </CButton>
+                        </CButtonGroup>
                     )
                   }
                 }}

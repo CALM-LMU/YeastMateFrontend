@@ -4,6 +4,7 @@ import { observer } from "mobx-react-lite"
 import {
   CBadge,
   CButton,
+  CButtonGroup,
   CCard,
   CCardBody,
   CCardFooter,
@@ -37,23 +38,9 @@ const cameraFields = [
   { key: 'Camera', _style: { width: '10%'} },
   { key: 'Delete', _style: { width: '15%'} },
   {
-    key: 'toggleDIC',
+    key: 'toggle',
     label: '',
     _style: { width: '20%' },
-    sorter: false,
-    filter: false
-  },
-  {
-    key: 'toggleCamera',
-    label: '',
-    _style: { width: '10%' },
-    sorter: false,
-    filter: false
-  },
-  {
-    key: 'toggleDelete',
-    label: '',
-    _style: { width: '1%' },
     sorter: false,
     filter: false
   }
@@ -63,23 +50,9 @@ const dimensionFields = [
   { key: 'Dimension', _style: { width: '53%'} },
   { key: 'status', _style: { width: '18%'} },
   {
-    key: 'Toggle',
+    key: 'toggle',
     label: '',
     _style: { width: '20%' },
-    sorter: false,
-    filter: false
-  },
-  {
-    key: 'Up',
-    label: '',
-    _style: { width: '10%' },
-    sorter: false,
-    filter: false
-  },
-  {
-    key: 'Down',
-    label: '',
-    _style: { width: '1%' },
     sorter: false,
     filter: false
   }
@@ -237,7 +210,9 @@ const AlignmentSettingsForm = (props) => {
   const handleAddPreset = () => {
     setModalAdd(false)
 
-    props.props.set(uuidv4(), {
+    var id = uuidv4()
+
+    props.props.set(id, {
       name: NameInput,
       alignment: true,
       videoSplit: true,
@@ -328,7 +303,7 @@ const AlignmentSettingsForm = (props) => {
               <CDataTable
                 items={props.props.get(selectPresetValue).channels}
                 fields={cameraFields}
-                itemsPerPage={10}
+                itemsPerPage={100}
                 hover
                 scopedSlots = {{
                   'DIC':
@@ -355,36 +330,28 @@ const AlignmentSettingsForm = (props) => {
                         </CBadge>
                       </td>
                     ),
-                    'toggleCamera':
+                    'toggle':
                       (item, index)=>{
                         return (
-                          <CButton onClick={()=>{toggleCameraStatus(index)}} color="primary" size="sm" variant="outline" shape="square">
-                            <FontAwesomeIcon icon="sync"/>   Change Camera
-                          </CButton>
-                      )
-                    },
-                    'toggleDIC':
-                      (item, index)=>{
-                        return (
-                          <CButton onClick={()=>{toggleDICStatus(index)}} color="primary" size="sm" variant="outline" shape="square">
-                            <FontAwesomeIcon icon="sync"/>   Toggle DIC
-                          </CButton>
-                      )
-                    },
-                    'toggleDelete':
-                      (item, index)=>{
-                        return (
-                          <CButton onClick={()=>{toggleDeleteStatus(index)}} color="danger" size="sm" variant="outline" shape="square">
-                            <FontAwesomeIcon icon="ban"/>   Toggle Delete
-                          </CButton>
+                          <CButtonGroup>
+                            <CButton onClick={()=>{toggleCameraStatus(index)}} color="dark" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="sync"/>   Change Camera
+                            </CButton>
+                            <CButton onClick={()=>{toggleDICStatus(index)}} color="dark" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="sync"/>   Toggle DIC
+                            </CButton>
+                            <CButton onClick={()=>{toggleDeleteStatus(index)}} color="danger" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="ban"/>   Toggle Delete
+                            </CButton>
+                          </CButtonGroup>
                       )
                     }
                   }}
                 />
-                <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm" variant="outline" shape="square">
+                <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
                   <FontAwesomeIcon icon="plus"/>   Add Channel
                 </CButton>
-                <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm" variant="outline" shape="square">
+                <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm">
                   <FontAwesomeIcon icon="ban"/>   Remove Channel
                 </CButton>
               </CFormGroup>
@@ -406,28 +373,20 @@ const AlignmentSettingsForm = (props) => {
                       </CBadge>
                     </td>
                   ),
-                  'Toggle':
+                  'toggle':
                     (item, index)=>{
                       return (
-                        <CButton onClick={()=>{toggleDimensionStatus(index)}} color="primary" size="sm" variant="outline" shape="square">
-                          <FontAwesomeIcon icon="sync"/>   Toggle Status
-                        </CButton>
-                    )
-                  },
-                  'Up':
-                    (item, index)=>{
-                      return (
-                        <CButton onClick={()=>{handleUp(index)}} color="primary" size="sm" variant="outline" shape="square">
-                          <FontAwesomeIcon icon="arrow-up"/>   Move Up
-                        </CButton>
-                    )
-                  },
-                  'Down':
-                    (item, index)=>{
-                      return (
-                        <CButton onClick={()=>{handleDown(index)}} color="primary" size="sm" variant="outline" shape="square">
-                          <FontAwesomeIcon icon="arrow-down"/>   Move Down
-                        </CButton>
+                        <CButtonGroup>
+                          <CButton onClick={()=>{toggleDimensionStatus(index)}} color="dark" size="sm" variant="outline">
+                            <FontAwesomeIcon icon="sync"/>   Toggle Status
+                          </CButton>
+                          <CButton onClick={()=>{handleUp(index)}} color="dark" size="sm" variant="outline">
+                            <FontAwesomeIcon icon="arrow-up"/>   Move Up
+                          </CButton>
+                          <CButton onClick={()=>{handleDown(index)}} color="dark" size="sm" variant="outline">
+                            <FontAwesomeIcon icon="arrow-down"/>   Move Down
+                          </CButton>
+                        </CButtonGroup>
                     )
                   }
                 }}
@@ -435,8 +394,8 @@ const AlignmentSettingsForm = (props) => {
             </CFormGroup>
           </CForm>
           <CModal 
-              show={modalAdd} 
-              onClose={setModalAdd}
+            show={modalAdd} 
+            onClose={setModalAdd}
           >
             <CModalHeader closeButton>
               <CModalTitle>Set preset name.</CModalTitle>

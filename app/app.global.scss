@@ -9,3 +9,18 @@
   -webkit-user-select: true;
   -webkit-app-region: no-drag;
 }
+
+.c-sidebar-brand {
+  display: flex;
+  flex: 0 0 $sidebar-brand-height;
+  align-items: center;
+  justify-content: center;
+
+  .c-sidebar-brand-min {
+    display: none;
+  }
+}
+
+.c-sidebar-brand-min {
+  display: none;
+}

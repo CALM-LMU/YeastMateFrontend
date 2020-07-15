@@ -6,15 +6,18 @@ import {
   TheHeader
 } from './index'
 
+// routes config
+import prop from '../routes'
+
 const TheLayout = () => {
 
   return (
     <div className="c-app c-default-layout">
-      <TheSidebar/>
+      <TheSidebar props={prop}/>
       <div className="c-wrapper">
-        <TheHeader/>
+        <TheHeader props={prop}/>
         <div className="c-body">
-          <TheContent/>
+          <TheContent props={prop.routes}/>
         </div>
         <TheFooter/>
       </div>

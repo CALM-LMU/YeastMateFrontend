@@ -10,19 +10,8 @@
  *
  * @flow
  */
-import { app, BrowserWindow, Menu, protocol, ipcMain, dialog } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
-
+import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
 const os = require('os');
-
-export default class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
 
 let mainWindow = null;
 
@@ -117,8 +106,4 @@ app.on('ready', async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 });

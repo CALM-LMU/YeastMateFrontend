@@ -5,9 +5,6 @@ import {
   Switch
 } from 'react-router-dom'
 import { CContainer, CFade } from '@coreui/react'
-
-// routes config
-import routes from '../routes'
   
 const loading = (
   <div className="pt-3 text-center">
@@ -15,22 +12,22 @@ const loading = (
   </div>
 )
 
-const TheContent = () => {
+const TheContent = (props) => {
   return (
     <main className="c-main">
       <CContainer fluid>
         <Suspense fallback={loading}>
           <Switch>
-            {routes.map((route, idx) => {
-              return route.component && (
+            {props.props.map((routes, idx) => {
+              return routes.component && (
                 <Route
                   key={idx}
-                  path={route.path}
-                  exact={route.exact}
-                  name={route.name}
+                  path={routes.path}
+                  exact={routes.exact}
+                  name={routes.name}
                   render={props => (
                     <CFade>
-                      <route.component props={route.data} />
+                      <routes.component props={routes.data} />
                     </CFade>
                   )} />
               )

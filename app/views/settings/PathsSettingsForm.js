@@ -2,12 +2,14 @@ import React from 'react'
 import {
   CBadge,
   CButton,
+  CButtonGroup,
   CCard,
   CCardBody,
   CCardHeader,
   CCardFooter,
   CDataTable,
   CForm,
+  CFormGroup
 } from '@coreui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -19,16 +21,9 @@ const uuidv4 = require("uuid/v4")
 
 const fields = [
   { key: 'Path', _style: { width: '53%'} },
-  { key: 'Server' ,_style: { width: '18%' } },
+  { key: 'Server', _style: { width: '18%'} },
   {
-    key: 'toggleserver',
-    label: '',
-    _style: { width: '15%' },
-    sorter: false,
-    filter: false
-  },
-  {
-    key: 'delete',
+    key: 'toggle',
     label: '',
     _style: { width: '20%' },
     sorter: false,
@@ -46,13 +41,13 @@ const getServerBadge = (server)=>{
 
 const PathsSettingsForm = (props) => {
   const toggleServerStatus = (index) => {
-    if (props.props.get("paths")[index].Server === 'True') {
-      props.props.get("paths")[index].Server = 'False'
-      props.props.set("paths", [...props.props.get("paths")])
+    if (props.props.get('pathList').pathList[index].Server === 'True') {
+      props.props.get('pathList').pathList[index].Server = 'False'
+      props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
     }
-    else if (props.props.get("paths")[index].Server === 'False') {
-      props.props.get("paths")[index].Server = 'True'
-      props.props.set("paths", [...props.props.get("paths")])
+    else if (props.props.get('pathList').pathList[index].Server === 'False') {
+      props.props.get('pathList').pathList[index].Server = 'True'
+      props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
     }
    }; 
   
@@ -62,55 +57,52 @@ const PathsSettingsForm = (props) => {
     });
 
     if (typeof path !== 'undefined') {
-      props.props.get("paths").push({_id: uuidv4(), Path:path, Server: "False"})
-      props.props.set("paths", [...props.props.get("paths")])
+      props.props.get('pathList').pathList.push({_id: uuidv4(), Path:path, Server: "False"})
+      props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
     }
   };
 
   const handleRemoveClick = (index) => {
-    props.props.get("paths").pop(index)
-    props.props.set("paths", [...props.props.get("paths")])
+    props.props.get('pathList').pathList.pop(index)
+    props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
   };
-  
+
   return (
     <>
       <CCard>
         <CCardHeader>Path Settings</CCardHeader>
         <CCardBody >
-          <CForm>
-          <CDataTable
-              items={props.props.get("paths")}
-              fields={fields}
-              tableFilter
-              itemsPerPageSelect
-              itemsPerPage={5}
-              hover
-              sorter
-              pagination
-              scopedSlots = {{
-                'Server':
-                    (item, index)=>{
-                      return (
+          <CForm encType="multipart/form-data" className="form-horizontal">
+            <CFormGroup>
+              <CDataTable
+                items={props.props.get('pathList').pathList}
+                fields={fields}
+                itemsPerPage={100}
+                hover
+                scopedSlots = {{
+                  'Server':
+                    (item)=>(
+                      <td>
                         <CBadge color={getServerBadge(item.Server)}>
                           {item.Server}
                         </CBadge>
-                    )},
-                'toggleserver':
-                    (item, index)=>{
-                      return (
-                        <CButton onClick={()=>{toggleServerStatus(index)}} color="primary" size="sm" variant="outline" shape="square">
-                          <FontAwesomeIcon icon="sync" />   Toggle Server
-                        </CButton>
-                    )},
-                'delete':
-                    (item, index)=>{
-                      return (
-                        <CButton onClick={()=>{handleRemoveClick(index)}} color="danger" size="sm" variant="outline" shape="square">
-                          <FontAwesomeIcon icon="ban" />   Delete
-                        </CButton>
-                    )}
-                }}
-            />
+                      </td>
+                    ),
+                  'toggle':
+                      (item, index)=>{
+                        return (
+                          <CButtonGroup>
+                            <CButton onClick={()=>{toggleServerStatus(index)}} color="dark" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="sync" />   Toggle Server
+                            </CButton>
+                            <CButton onClick={()=>{handleRemoveClick(index)}} color="danger" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="ban" />   Delete
+                            </CButton>
+                          </CButtonGroup>
+                      )}
+                  }}
+              />
+            </CFormGroup>
           </CForm>
         </CCardBody>
         <CCardFooter>

@@ -1,5 +1,4 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
 import {
   CCreateElement,
   CSidebar,
@@ -11,20 +10,18 @@ import {
   CSidebarNavDropdown,
   CSidebarNavItem,
 } from '@coreui/react'
+import { observer } from "mobx-react-lite"
 
 import CIcon from '@coreui/icons-react'
 
 // sidebar nav config
 import navigation from './_nav'
 
-const TheSidebar = () => {
-  const dispatch = useDispatch()
-  const show = useSelector(state => state.sidebarShow)
-
+const TheSidebar = (props) => {
   return (
-    <CSidebar
-      show={show}
-      onShowChange={(val) => dispatch({type: 'set', sidebarShow: val })}
+    <CSidebar 
+      show={props.props.sidebarShow.get("show")}
+      onShowChange={(val) => props.props.sidebarShow.set('show', val)}
     > 
       <CSidebarBrand id="title-bar" className="d-md-down-none" to="/">
         <CIcon
@@ -33,12 +30,12 @@ const TheSidebar = () => {
           height={35}
         />
         <CIcon
-          className="c-sidebar-brand-minimized"
-          name="sygnet"
+          className="c-sidebar-brand-min"
+          name="logo-negative"
           height={35}
         />
       </CSidebarBrand>
-      <CSidebarNav>
+      <CSidebarNav >
         <CCreateElement
           items={navigation}
           components={{
@@ -54,4 +51,4 @@ const TheSidebar = () => {
   )
 }
 
-export default React.memo(TheSidebar)
+export default React.memo(observer(TheSidebar))

@@ -41,13 +41,13 @@ const getServerBadge = (server)=>{
 
 const PathsSettingsForm = (props) => {
   const toggleServerStatus = (index) => {
-    if (props.props.get('pathList').pathList[index].Server === 'True') {
-      props.props.get('pathList').pathList[index].Server = 'False'
-      props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
+    if (props.props.get('pathList')[index].Server === 'True') {
+      props.props.get('pathList')[index].Server = 'False'
+      props.props.set('pathList', [...props.props.get('pathList')])
     }
-    else if (props.props.get('pathList').pathList[index].Server === 'False') {
-      props.props.get('pathList').pathList[index].Server = 'True'
-      props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
+    else if (props.props.get('pathList')[index].Server === 'False') {
+      props.props.get('pathList')[index].Server = 'True'
+      props.props.set('pathList', [...props.props.get('pathList')])
     }
    }; 
   
@@ -57,14 +57,16 @@ const PathsSettingsForm = (props) => {
     });
 
     if (typeof path !== 'undefined') {
-      props.props.get('pathList').pathList.push({_id: uuidv4(), Path:path, Server: "False"})
-      props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
+      console.log(props.props.get('pathList'))
+      props.props.get('pathList').push({_id: uuidv4(), Path:path, Server: "False"})
+      props.props.set('pathList', [...props.props.get('pathList')])
+      console.log(props.props.get('pathList'))
     }
   };
 
   const handleRemoveClick = (index) => {
-    props.props.get('pathList').pathList.pop(index)
-    props.props.set('pathList', {pathList: [...props.props.get('pathList').pathList]})
+    props.props.get('pathList').pop(index)
+    props.props.set('pathList', [...props.props.get('pathList')])
   };
 
   return (
@@ -75,7 +77,7 @@ const PathsSettingsForm = (props) => {
           <CForm encType="multipart/form-data" className="form-horizontal">
             <CFormGroup>
               <CDataTable
-                items={props.props.get('pathList').pathList}
+                items={props.props.get('pathList')}
                 fields={fields}
                 itemsPerPage={100}
                 hover

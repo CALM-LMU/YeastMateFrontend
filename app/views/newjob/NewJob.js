@@ -20,10 +20,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const NewJob = (props) => {
-  const [alignpresetList, setalignpresetList] = React.useState([{_id: 'null', name: "No Alignment"}])
-  const [detectionpresetList, setdetectionpresetList] = React.useState([{_id: 'null', name: "No Detection"}])
-  const [maskpresetList, setmaskpresetList] = React.useState([{_id: 'null', name: "No Mask Generation"}])
-
   const [toasts, setToasts] = React.useState([
     {}
   ])
@@ -43,24 +39,8 @@ const NewJob = (props) => {
     ])
   }
 
-  const modalCancel = () => {
-    setModalMount(false)
-    setpassword("")
-  }
-
-  const handleSubmitClick = () => {
-    const idx = mountList.findIndex(p => p._id === document.getElementById("selectPath").value)
-    
-    if (mountList[idx].Server == 'True') {
-      setModalMount(true)
-    }
-    else {
-      submitJob();
-    }
-  }
-
   const submitJob = () => {
-    
+    addToast('Success', 'Job submitted succesfully!')
   };
 
   return (
@@ -74,7 +54,7 @@ const NewJob = (props) => {
             <CFormGroup>
               <CLabel>Select the mounted folder to your data. If your folder has not been mounted yet, mount it under Paths Settings</CLabel>
               <CSelect custom name="select" id="selectPath">
-                {props.props.paths.get('pathList').pathList.map((path, idx) => {
+                {props.props.paths.get('pathList').map((path, idx) => {
                     return path &&
                     (<option
                     value={path._id}
@@ -147,7 +127,7 @@ const NewJob = (props) => {
           </CForm>
         </CCardBody>
         <CCardFooter>
-          <CButton type="submit" size="sm" onClick={handleSubmitClick} color="primary"><FontAwesomeIcon icon="upload" /> Submit</CButton>
+          <CButton type="submit" size="sm" onClick={submitJob} color="primary"><FontAwesomeIcon icon="upload" /> Submit</CButton>
         </CCardFooter>
       </CCard>
       {Object.keys(toasters).map((toasterKey) => (

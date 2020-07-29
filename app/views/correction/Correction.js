@@ -1,6 +1,5 @@
 import React, { lazy } from 'react'
-import { observer } from "mobx-react-lite"
-import  Annotation  from 'react-image-annotation'
+import ReactImageAnnotate from "react-image-annotate"
 
 var fs = require('fs');
 var path = require('path');
@@ -13,46 +12,47 @@ import {
   CCardBody,
   CCardHeader,
   CCardFooter,
+  CCardText
 } from '@coreui/react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+// , regions: [{cls: "Mitosis", color: "#f44336", h: 0.08316782442253823, highlighted: false, id: "80511864713799", type: "box", w: 0.028778973652664575, x: 0.2829494, y: 0.7200156294294208}]
 
 const Correction = () => {
   const isFirstRun = React.useRef(true);
-  const [counter, setcounter] = React.useState(0)
-  const [image, setimage] = React.useState("https://davidbunk.github.io/bubu.jpeg")
+  const imageDir = React.useRef('');
+  const [imagesLoaded, setimagesLoaded] = React.useState(false);  
+  const [imagesSaved, setimagesSaved] = React.useState(true);
   const [imagePaths, setimagePaths] = React.useState([])
-  const [labelPaths, setlabelPaths] = React.useState([])
-  const [annotations, setannotations] = React.useState([])
-  const [annotation, setannotation] = React.useState({})
-
-  const onSubmit = (annotation) => {
-    const { geometry, data } = annotation
- 
-    setannotation({});
-    setannotations(annotations.concat({
-      geometry,
-      data: {
-        ...data,
-        id: Math.random()
-      }
-    }))
-  }
 
   const get_files = (dir) => {
-    let tmpArr = []
     fs.readdir(dir, function(err, files) {
-      files.forEach(async (file) => file.indexOf('.png') !== -1 && tmpArr.push('file:///' + path.join(dir, file)))
-      setimage(tmpArr[0])
-      setimagePaths(tmpArr)
-      setcounter(counter+1)
+      files.forEach(async (file) => {
+        if (file.indexOf('.png') !== -1 | file.indexOf('.tif') !== -1 | file.indexOf('.jpg') !== -1) {
+          var imageSrc = path.join(dir, file)
+          imagePaths.push({src: imageSrc, name: file})
+          setimagePaths([...imagePaths])
+        }
+      })
+
+      imageDir.current = dir
+      setimagesLoaded(true)
+      setimagesSaved(false)
     })  
   };
-    
-  const post_img = (event) => {
-    setimage(imagePaths[counter])
-    setcounter(counter+1)
+
+  const saveJSON = (res) => {
+    var json = JSON.stringify(res.images);
+
+    console.log(res)
+
+    fs.writeFile(imageDir.current + '/groundtruth.json', json, 'utf8', (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+
+    setimagesSaved(true)
   }
 
   React.useEffect(() => { 
@@ -81,20 +81,26 @@ const Correction = () => {
     <>
       <CCard>
         <CCardHeader>Correct detections</CCardHeader>
-        <CCardBody >
-          <Annotation
-            src={image}
-            annotations={annotations}
-            value={annotation}
-            onChange={setannotation}
-            onSubmit={onSubmit}
-          />
-        </CCardBody>
+          {imagesLoaded &&
+            <CCardBody >
+              <ReactImageAnnotate
+              taskDescription="Draw boxes around all mito events."
+              images={imagePaths}
+              regionClsList={["Mitosis"]}
+              enabledTools={["select", "create-box"]}
+              onExit={(res) => saveJSON(res)}
+              />
+            </CCardBody>
+          }
         <CCardFooter>
-          <CButton type="add" id='load-btn' size="sm" color="secondary"><FontAwesomeIcon icon="plus" /> Load images</CButton>
-          <CButton type="add" size="sm" color="secondary"><FontAwesomeIcon icon="plus" /> Go back</CButton>
-          <CButton type="add" onClick={post_img} value={false} size="sm" color="danger"><FontAwesomeIcon icon="ban" /> Incorrect</CButton>
-          <CButton type="add" onClick={post_img} value={true} size="sm" color="success"><FontAwesomeIcon icon="plus" /> Correct</CButton>
+          {imagesSaved &&
+            <CButton type="add" id='load-btn' size="sm" color="secondary"><FontAwesomeIcon icon="plus" /> Load new images</CButton>
+          }
+          {!imagesSaved &&
+            <CCardText>
+              Save annotations to load new images!
+            </CCardText>
+          }
         </CCardFooter>
       </CCard>
     </>

@@ -8,7 +8,7 @@ const TheFooter = () => {
         <a href="https://calm.bio.lmu.de" target="_blank" rel="noopener noreferrer">Center for Advanced Light Microscopy</a>
       </div>
       <div className="mfs-auto">
-        <a>Version 0.4.1</a>
+        <a>Version 0.5.0</a>
       </div>
       <div className="mfs-auto">
         <span className="mr-1">Contact me at </span>

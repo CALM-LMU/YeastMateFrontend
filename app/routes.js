@@ -22,13 +22,16 @@ var maskPresetList = observable(new Map())
 sidebarShow.set('show', 'responsive')
 
 if (typeof store.get('paths') !== 'undefined') {
-  pathList.set('pathList', store.get('paths'))
+  pathList.set('pathList', store.get('paths').pathList)
 }
 else {
   pathList.set('pathList', [
     { Path: "Placeholder", Server: "False", id: "d401b8ea-2e03-4b37-a3a1-243a1c538882" }
   ])
 }
+
+console.log(pathList)
+console.log(store.get('paths'))
 
 alignPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
   name: "Default",

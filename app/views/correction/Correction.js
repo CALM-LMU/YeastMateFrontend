@@ -28,14 +28,19 @@ const Correction = () => {
 
   const get_files = (dir) => {
     fs.readdir(dir, function(err, files) {
-      files.forEach(async (file) => {
-        if (file.indexOf('.png') !== -1 | file.indexOf('.tif') !== -1 | file.indexOf('.jpg') !== -1) {
-          var imageSrc = path.join(dir, file)
-          imagePaths.push({src: imageSrc, name: file})
-          setimagePaths([...imagePaths])
-        }
-      })
-
+      if (files.indexOf('groundtruth.json') !== -1) {
+        console.log(path.join(dir, files[files.indexOf('groundtruth.json')]))
+        setimagePaths(JSON.parse(fs.readFileSync(path.join(dir, files[files.indexOf('groundtruth.json')]))))
+      }
+      else {
+        files.forEach(async (file) => {
+          if (file.indexOf('.png') !== -1 | file.indexOf('.tif') !== -1 | file.indexOf('.jpg') !== -1) {
+            var imageSrc = path.join(dir, file)
+            imagePaths.push({src: imageSrc, name: file})
+            setimagePaths([...imagePaths])
+          }
+        })
+      }
       imageDir.current = dir
       setimagesLoaded(true)
       setimagesSaved(false)
@@ -80,13 +85,13 @@ const Correction = () => {
   return (
     <>
       <CCard>
-        <CCardHeader>Correct detections</CCardHeader>
+        <CCardHeader>Label detections</CCardHeader>
           {imagesLoaded &&
             <CCardBody >
               <ReactImageAnnotate
               taskDescription="Draw boxes around all mito events."
               images={imagePaths}
-              regionClsList={["Mitosis"]}
+              regionClsList={["Mitosis", "Blob Mitosis"]}
               enabledTools={["select", "create-box"]}
               onExit={(res) => saveJSON(res)}
               />

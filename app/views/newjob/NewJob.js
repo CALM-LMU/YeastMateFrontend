@@ -1,6 +1,8 @@
 import React from 'react'
 
 import { observer } from "mobx-react-lite"
+import axios from 'axios';
+const uuidv4 = require("uuid/v4")
 
 import {
   CButton,
@@ -40,7 +42,21 @@ const NewJob = (props) => {
   }
 
   const submitJob = () => {
-    addToast('Success', 'Job submitted succesfully!')
+    axios.post(
+      'http://127.0.0.1:5000/',
+      {
+        _id: uuidv4(),
+        path: document.getElementById("selectPath").value,
+        align: props.props.alignment.get(document.getElementById("selectAlign").value),
+        detect: props.props.detection.get(document.getElementById("selectDetection").value),
+        mask: props.props.mask.get(document.getElementById("selectMask").value)
+      }
+    ).then(function (response) {
+      addToast('Success', 'Job succesfully submitted to server.');
+    })
+    .catch(function (error) {
+      addToast('Error', 'Job could not be sent to server. A bug report was sent.');
+    })
   };
 
   return (
@@ -57,7 +73,7 @@ const NewJob = (props) => {
                 {props.props.paths.get('pathList').map((path, idx) => {
                     return path &&
                     (<option
-                    value={path._id}
+                    value={path.Path}
                     >
                       {path.Path}
                     </option>

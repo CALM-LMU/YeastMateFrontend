@@ -26,12 +26,9 @@ if (typeof store.get('paths') !== 'undefined') {
 }
 else {
   pathList.set('pathList', [
-    { Path: "Placeholder", Server: "False", id: "d401b8ea-2e03-4b37-a3a1-243a1c538882" }
+    { Path: "Placeholder", id: "d401b8ea-2e03-4b37-a3a1-243a1c538882" }
   ])
 }
-
-console.log(pathList)
-console.log(store.get('paths'))
 
 alignPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
   name: "Default",
@@ -62,12 +59,14 @@ detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
       {"Type":"Green","index":2}
     ],
     boxsize: 200,
+    zstack: false,
     video: false,
     videoSplit: true
  })
 
 maskPresetList.set("2166753e-e6e0-4092-b0d1-38e84060033c", {
     name: "Default",
+    zstack: false,
     channels: [
       {"Type":"Green","index":0},
       {"Type":"Red","index":0},

@@ -9,6 +9,7 @@ import {
   CCardBody,
   CCardFooter,
   CCardHeader,
+  CCol,
   CDataTable,
   CForm,
   CFormGroup,
@@ -20,6 +21,7 @@ import {
   CModalBody,
   CModalTitle,
   CSelect,
+  CSwitch,
   CToast,
   CToastBody,
   CToastHeader,
@@ -94,6 +96,15 @@ const MaskSettingsForm = (props) => {
     }
   };
 
+  const switchStack = () => {
+    if (props.props.get(selectPresetValue).zstack === true) {
+      props.props.get(selectPresetValue).zstack = false
+    }
+    else {
+      props.props.get(selectPresetValue).zstack = true
+    }
+  }
+
   const handleAddPreset = () => {
     setModalAdd(false)
 
@@ -141,6 +152,16 @@ const MaskSettingsForm = (props) => {
                   </option>
                 )})}
               </CSelect>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="5">
+                  <CLabel>Detection on z-stacks?</CLabel>
+              </CCol>
+              <CCol md="5">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchStack} checked={props.props.get(selectPresetValue).zstack} id="stackYes"/>
+                </CFormGroup>
+              </CCol>
             </CFormGroup>
             <CFormGroup>
               <CDataTable

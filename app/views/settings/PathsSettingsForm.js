@@ -21,7 +21,6 @@ const uuidv4 = require("uuid/v4")
 
 const fields = [
   { key: 'Path', _style: { width: '53%'} },
-  { key: 'Server', _style: { width: '18%'} },
   {
     key: 'toggle',
     label: '',
@@ -31,26 +30,7 @@ const fields = [
   }
 ]
 
-const getServerBadge = (server)=>{
-  switch (server) {
-    case "True": return 'success'
-    case "False": return 'secondary'
-    default: return 'primary'
-  }
-}
-
 const PathsSettingsForm = (props) => {
-  const toggleServerStatus = (index) => {
-    if (props.props.get('pathList')[index].Server === 'True') {
-      props.props.get('pathList')[index].Server = 'False'
-      props.props.set('pathList', [...props.props.get('pathList')])
-    }
-    else if (props.props.get('pathList')[index].Server === 'False') {
-      props.props.get('pathList')[index].Server = 'True'
-      props.props.set('pathList', [...props.props.get('pathList')])
-    }
-   }; 
-  
   const handleAddClick = () => {
     var path = dialog.showOpenDialog({
       properties: ['openDirectory']
@@ -58,7 +38,7 @@ const PathsSettingsForm = (props) => {
 
     if (typeof path !== 'undefined') {
       console.log(props.props.get('pathList'))
-      props.props.get('pathList').push({_id: uuidv4(), Path:path, Server: "False"})
+      props.props.get('pathList').push({_id: uuidv4(), Path:path})
       props.props.set('pathList', [...props.props.get('pathList')])
       console.log(props.props.get('pathList'))
     }
@@ -82,25 +62,12 @@ const PathsSettingsForm = (props) => {
                 itemsPerPage={100}
                 hover
                 scopedSlots = {{
-                  'Server':
-                    (item)=>(
-                      <td>
-                        <CBadge color={getServerBadge(item.Server)}>
-                          {item.Server}
-                        </CBadge>
-                      </td>
-                    ),
                   'toggle':
                       (item, index)=>{
                         return (
-                          <CButtonGroup>
-                            <CButton onClick={()=>{toggleServerStatus(index)}} color="dark" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="sync" />   Toggle Server
-                            </CButton>
-                            <CButton onClick={()=>{handleRemoveClick(index)}} color="danger" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="ban" />   Delete
-                            </CButton>
-                          </CButtonGroup>
+                          <CButton onClick={()=>{handleRemoveClick(index)}} color="danger" size="sm" variant="outline">
+                            <FontAwesomeIcon icon="ban" />   Delete
+                          </CButton>
                       )}
                   }}
               />

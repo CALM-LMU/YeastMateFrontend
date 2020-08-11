@@ -97,6 +97,15 @@ const DetectionSettingsForm = (props) => {
     }
   };
 
+  const switchStack = () => {
+    if (props.props.get(selectPresetValue).zstack === true) {
+      props.props.get(selectPresetValue).zstack = false
+    }
+    else {
+      props.props.get(selectPresetValue).zstack = true
+    }
+  }
+
   const switchVideo = () => {
     if (props.props.get(selectPresetValue).video === true) {
       props.props.get(selectPresetValue).video = false
@@ -167,7 +176,17 @@ const DetectionSettingsForm = (props) => {
               </CSelect>
             </CFormGroup>
             <CFormGroup row>
-              <CCol md="3">
+              <CCol md="5">
+                  <CLabel>Detection on z-stacks?</CLabel>
+              </CCol>
+              <CCol md="5">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchStack} checked={props.props.get(selectPresetValue).zstack} id="stackYes"/>
+                </CFormGroup>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="5">
                   <CLabel>Detection on videos?</CLabel>
               </CCol>
               <CCol md="5">
@@ -177,10 +196,10 @@ const DetectionSettingsForm = (props) => {
               </CCol>
             </CFormGroup>
             <CFormGroup row>
-              <CCol md="3">
+              <CCol md="5">
                   <CLabel>Split videos into single files?</CLabel>
               </CCol>
-              <CCol md="9">
+              <CCol md="5">
                 <CFormGroup>
                   <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
                 </CFormGroup>

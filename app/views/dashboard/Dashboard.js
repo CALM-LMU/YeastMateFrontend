@@ -10,7 +10,7 @@ import {
   CToast,
   CToaster,
   CToastBody,
-  CToastHeader
+  CToastHeader,
 } from '@coreui/react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -18,11 +18,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios'
 
 const fields = [
-  { key: 'Job', _style: { width: '15%'} },
+  { key: 'Job', _style: { width: '25%'} },
   { key: 'Path', _style: { width: '50%'} },
-  {
-    key: 'status', _style: { width: '25%' },
-  },
+  { key: 'status', _style: { width: '30%' } },
   {
     key: 'delete',
     label: '',
@@ -107,24 +105,24 @@ const Dashboard = () => {
             <CDataTable
               items={jobList}
               fields={fields}
-              tableFilter
-              itemsPerPageSelect
-              itemsPerPage={5}
+              itemsPerPage={10}
               hover
-              sorter
               pagination
               scopedSlots = {{
                 'status':
-                    (item, index)=>{
+                    (item)=>{
                       return (
-                        <CBadge color={getStatusBadge(item.Status)}>
-                          {item.Status}
-                        </CBadge>
+                        <td>
+                          <CBadge color={getStatusBadge(item.Status)}>
+                            {item.Status}
+                          </CBadge>
+                        </td>
+                        
                     )},
                 'delete':
-                    (item, index)=>{
+                    (index)=>{
                       return (
-                        <CButton onClick={()=>{handleRemoveClick(index)}} color="danger" size="sm" variant="outline" shape="square">
+                        <CButton onClick={()=>{handleRemoveClick(index)}} color="danger" size="sm" variant="outline">
                           <FontAwesomeIcon icon="ban" />   Abort
                         </CButton>
                     )

@@ -7,7 +7,6 @@ import {
   CCardHeader,
   CDataTable,
   CForm,
-  CProgress,
   CToast,
   CToaster,
   CToastBody,
@@ -35,20 +34,15 @@ const fields = [
 
 const getStatusBadge = (status)=>{
   switch (status) {
-    case "RECEIVED": return 'info'
-    case "PENDING": return 'warning'
-    case "PROGRESS": return 'primary'
-    case "SUCCESS": return 'success'
-    case "FAILURE": return 'danger'
-    default: return 'primary'
+    case "Pending": return 'warning'
+    case "Running": return 'primary'
+    case "Failed": return 'danger'
+    default: return 'secondary'
   }
 }
 
 const Dashboard = () => {
   const [jobList, setjobList] = React.useState([])
-  const [jobProgress, setjobProgress] = React.useState(0)
-  const [jobType, setjobType] = React.useState('Nothing')
-  const [jobPath, setjobPath] = React.useState('nowhere')
 
   const [toasts, setToasts] = React.useState([
     {}
@@ -71,59 +65,10 @@ const Dashboard = () => {
 
   const get_jobs = async () => {
     const result = await axios(
-      'http://127.0.0.1:5555/api/tasks',
+      'http://127.0.0.1:5000/',
     );
 
-    var taskList = []
-    var path = 'nowhere'
-    var type = 'No task running'
-
-    for (const [key, value] of Object.entries(result.data)) {
-      if (value.state === 'PENDING') {
-        var kwargs = value.kwargs.split("'")[3]
-      }
-      else {
-        var kwargs = value.kwargs
-
-        if (value.state === 'PROGRESS') {
-          var path = value.kwargs
-          if (value.name === 'tasks.align'){
-            var type = 'Alignment'
-          }
-          if (value.name === 'tasks.detect'){
-            var type = 'Detection'
-          }
-          if (value.name === 'tasks.mask'){
-            var type = 'Masking'
-          }
-        }  
-      }
-
-      if (value['state'] === 'PROGRESS') {
-        var progress = value.result
-        var truncated_kwargs = kwargs.replace(kwargs.split('\\').pop().split('/').pop(), '')
-      }
-      else {
-        var truncated_kwargs = kwargs
-      }
-      
-      if (value.name === 'tasks.align') {
-        var tmpDict = {"_id": key, "Job": 'Alignment', "Path": truncated_kwargs, 'Status': value.state}
-      }
-      else if (value.name === 'tasks.detect') {
-        var tmpDict = {"_id": key, "Job": 'Detection', "Path": truncated_kwargs, 'Status': value.state}
-      }
-      else if (value.name === 'tasks.mask') {
-        var tmpDict = {"_id": key, "Job": 'Mask', "Path": truncated_kwargs, 'Status': value.state}
-      }
-
-      taskList.push(tmpDict)
-    }
-
-    setjobList(taskList);
-    setjobType(type);
-    setjobPath(path);
-    setjobProgress(progress);
+    setjobList(result.data.tasks);
   };
 
   const handleRemoveClick = (index) => {
@@ -134,13 +79,9 @@ const Dashboard = () => {
       let newJobs = jobList.slice()
       newJobs.splice(index, 1)
       setjobList([...newJobs])
-
-      setjobType('No task running');
-      setjobPath('nowhere');
-      setjobProgress(0);
     })
     .catch(function (error) {
-      addToast('Error', 'Unable to connect to server, try again. A bug report was sent.');
+      addToast('Error', 'Cancelling tasks not implemented yet. Coming soon.');
     })
   }
 
@@ -191,14 +132,6 @@ const Dashboard = () => {
               }}
             />
           </CForm>
-        </CCardBody>
-      </CCard>
-      <CCard>
-        <CCardHeader>
-          Progress: {jobType} in {jobPath}
-        </CCardHeader>
-        <CCardBody>
-          <CProgress animated value={jobProgress} className="mb-3" />
         </CCardBody>
       </CCard>
       {Object.keys(toasters).map((toasterKey) => (

@@ -23,7 +23,7 @@ const TheSidebar = (props) => {
       show={props.props.sidebarShow.get("show")}
       onShowChange={(val) => props.props.sidebarShow.set('show', val)}
     > 
-      <CSidebarBrand id="title-bar" className="d-md-down-none" to="/">
+      <CSidebarBrand id="title-bar" className="d-md-down">
         <CIcon
           className="c-sidebar-brand-full"
           name="logo-negative"
@@ -46,7 +46,7 @@ const TheSidebar = (props) => {
           }}
         />
       </CSidebarNav>
-      <CSidebarMinimizer className="c-d-md-down-none"/>
+      <CSidebarMinimizer className="c-d-md-down"/>
     </CSidebar>
   )
 }

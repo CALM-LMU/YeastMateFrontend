@@ -1,7 +1,7 @@
 {
   "name": "mitoscanner",
   "productName": "mitoscanner",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Electron/React Interface for MitoScanner using BioDetectron",
   "main": "./main.prod.js",
   "author": {

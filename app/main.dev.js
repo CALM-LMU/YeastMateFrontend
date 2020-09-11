@@ -13,6 +13,8 @@
 import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
 const os = require('os');
 
+const {shell} = require('electron');
+
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -71,6 +73,8 @@ app.on('ready', async () => {
   ) {
     await installExtensions();
   }
+
+  shell.openItem('C:/Users/david/Projects/BioElectron/python/main.exe');
 
   mainWindow = new BrowserWindow({
     show: false,

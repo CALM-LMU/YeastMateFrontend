@@ -43,13 +43,12 @@ const NewJob = (props) => {
 
   const submitJob = () => {
     axios.post(
-      'http://127.0.0.1:5000/',
+      'http://127.0.0.1:5005/',
       {
         _id: uuidv4(),
         path: document.getElementById("selectPath").value,
         align: props.props.alignment.get(document.getElementById("selectAlign").value),
         detect: props.props.detection.get(document.getElementById("selectDetection").value),
-        mask: props.props.mask.get(document.getElementById("selectMask").value)
       }
     ).then(function (response) {
       addToast('Success', 'Job succesfully submitted to server.');
@@ -116,26 +115,6 @@ const NewJob = (props) => {
                     name={props.props.detection.get(key).name}
                     >
                       {props.props.detection.get(key).name}
-                    </option>
-                  )})}
-              </CSelect>
-            </CFormGroup>
-            <CFormGroup>
-              <CLabel>Mask Preset.</CLabel>
-              <CSelect custom name="select" id="selectMask">
-                <option
-                  value={null}
-                  name='No mask generation'
-                  >
-                    No mask generation
-                </option>
-                {Array.from( props.props.mask ).map(([key, value]) => {
-                    return props.props.mask.get(key).name &&
-                    (<option
-                    value={key}
-                    name={props.props.mask.get(key).name}
-                    >
-                      {props.props.mask.get(key).name}
                     </option>
                   )})}
               </CSelect>

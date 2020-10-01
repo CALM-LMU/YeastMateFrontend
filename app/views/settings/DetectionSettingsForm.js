@@ -1,16 +1,15 @@
 import React from 'react'
 import { observer } from "mobx-react-lite"
 
+import NumericInput from 'react-numeric-input';
+
 import {
-  CBadge,
   CButton,
-  CButtonGroup,
   CCard,
   CCardBody,
   CCardFooter,
   CCardHeader,
   CCol,
-  CDataTable,
   CForm,
   CFormGroup,
   CInput,
@@ -32,25 +31,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const uuidv4 = require("uuid/v4")
 
-const channelFields = [
-  { key: 'Type', _style: { width: '50%'} },
-  {
-    key: 'toggle',
-    label: '',
-    _style: { width: '10%' },
-    sorter: false,
-    filter: false
-  }
-]
-
-const getChannelBadge = (Type)=>{
-  switch (Type) {
-    case 'DIC': return 'secondary'
-    case 'Green': return 'success'
-    case 'Red': return 'danger'
-    default: return 'primary'
-  }
-}
 
 const DetectionSettingsForm = (props) => {
   const [modalAdd, setModalAdd] = React.useState(false)
@@ -77,26 +57,6 @@ const DetectionSettingsForm = (props) => {
     ])
   }
   
-  const array_move = (arr, old_index, new_index) => {
-    if (new_index <= arr.length) {
-      arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-    }
-  };
-
-  const handleUp = (index) => {
-    if (index-1 >= 0) {
-      array_move(props.props.get(selectPresetValue).channels, index, index-1)
-      props.props.get(selectPresetValue).channels = [...props.props.get(selectPresetValue).channels]
-    } 
-  };
-
-  const handleDown = (index) => {
-    if (index+1 <= props.props.get(selectPresetValue).channels.length) {
-      array_move(props.props.get(selectPresetValue).channels, index, index+1)
-      props.props.get(selectPresetValue).channels = [...props.props.get(selectPresetValue).channels]
-    }
-  };
-
   const switchStack = () => {
     if (props.props.get(selectPresetValue).zstack === true) {
       props.props.get(selectPresetValue).zstack = false
@@ -124,20 +84,34 @@ const DetectionSettingsForm = (props) => {
     }
   }
 
+  const switchFiji = () => {
+    if (props.props.get(selectPresetValue).fiji === true) {
+      props.props.get(selectPresetValue).fiji = false
+    }
+    else {
+      props.props.get(selectPresetValue).fiji = true
+    }
+  }
+
+  const setgraychannel = (value) => {
+    props.props.get(selectPresetValue).graychannel = value
+  }
+
+  const setIP = (value) => {
+    props.props.get(selectPresetValue).ip = value
+  }
+
   const handleAddPreset = () => {
     setModalAdd(false)
 
     const id = uuidv4()
     props.props.set(id, {
       name: NameInput,
-      channels: [
-        {"Type":"DIC","index":0},
-        {"Type":"Red","index":1},
-        {"Type":"Green","index":2}
-      ],
-      boxsize: 200,
+      graychannel: 0,
       video: false,
-      videoSplit: true 
+      videoSplit: true, 
+      fiji: true,
+      ip: '127.0.0.1:5000'
     })
 
     setselectPresetValue(id)
@@ -206,42 +180,30 @@ const DetectionSettingsForm = (props) => {
               </CCol>
             </CFormGroup>
             <CFormGroup row>
-              <CCol md="2">
-                  <CLabel>Box size</CLabel>
+              <CCol md="5">
+                  <CLabel>Convert into Fiji-compatible image format?</CLabel>
               </CCol>
-              <CCol sm="1">
+              <CCol md="5">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchFiji} checked={props.props.get(selectPresetValue).fiji} id="fijiYes"/>
+                </CFormGroup>
               </CCol>
             </CFormGroup>
-            <CFormGroup>
-              <CDataTable
-              items={props.props.get(selectPresetValue).channels}
-              fields={channelFields}
-              itemsPerPage={10}
-              hover
-              scopedSlots = {{
-                'Type':
-                  (item)=>(
-                    <td>
-                      <CBadge color={getChannelBadge(item.Type)}>
-                        {item.Type}
-                      </CBadge>
-                    </td>
-                  ),
-                  'toggle':
-                    (item, index)=>{
-                      return (
-                        <CButtonGroup>
-                          <CButton onClick={()=>{handleUp(index)}} color="dark" size="sm" variant="outline">
-                            <FontAwesomeIcon icon="arrow-up" />   Move Up
-                          </CButton>
-                          <CButton onClick={()=>{handleDown(index)}} color="dark" size="sm" variant="outline">
-                            <FontAwesomeIcon icon="arrow-down" />   Move Down
-                          </CButton>
-                        </CButtonGroup>
-                    )
-                  }
-                }}
-              />
+            <CFormGroup row>
+              <CCol md="5">
+                <CLabel>Axis of gray (BF/DIC) overview channel.</CLabel>
+              </CCol>
+              <CCol sm="1">
+                <NumericInput min={0} max={10} step={1} value={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event)}/>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="5">
+                <CLabel>IP address and port of detection server.</CLabel>
+              </CCol>
+              <CCol sm="6">
+                <CInput id="ipInput" onChange={(event) => setIP(event.currentTarget.value)} value={props.props.get(selectPresetValue).ip}></CInput>
+              </CCol>
             </CFormGroup>
           </CForm>
           <CModal 

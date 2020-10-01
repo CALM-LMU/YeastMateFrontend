@@ -40,12 +40,6 @@ export default [
     icon: 'cil-align-left',
   },
   {
-    _tag: 'CSidebarNavItem',
-    name: 'Mask',
-    to: '/mask',
-    icon: 'cil-align-left',
-  },
-  {
     _tag: 'CSidebarNavDivider',
     className: 'm-2'
   }

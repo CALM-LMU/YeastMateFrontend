@@ -1,8 +1,8 @@
 {
-  "name": "mitoscanner",
-  "productName": "mitoscanner",
-  "version": "0.6.1",
-  "description": "Electron/React Interface for MitoScanner using BioDetectron",
+  "name": "yeastmate",
+  "productName": "yeastmate",
+  "version": "0.7.1",
+  "description": "YeastMate Electron/React Interface using BioDetectron",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development webpack --config ./configs/webpack.config.renderer.dev.dll.babel.js --colors",
@@ -56,7 +56,7 @@
     ]
   },
   "build": {
-    "productName": "MitoScanner",
+    "productName": "YeastMate",
     "appId": "org.develar.ElectronReact",
     "extends": null,
     "files": [
@@ -68,8 +68,8 @@
       "main.prod.js.map",
       "package.json"
     ],
-    "extraFiles": [
-      "python"
+    "extraResources": [
+      "python/YeastMateBackend.exe"
     ],
     "dmg": {
       "contents": [
@@ -269,6 +269,7 @@
     "classnames": "^2.2.6",
     "connected-react-router": "^6.6.0",
     "core-js": "3.4.1",
+    "csv-parser": "^2.3.3",
     "devtron": "^1.4.0",
     "electron-debug": "^3.0.1",
     "electron-log": "^3.0.9",
@@ -297,6 +298,7 @@
     "source-map-support": "^0.5.16",
     "tiff.js": "^1.0.0",
     "typescript": "^3.9.5",
+    "upath": "^1.2.0",
     "utif": "^3.1.0",
     "uuid": "^8.2.0"
   },

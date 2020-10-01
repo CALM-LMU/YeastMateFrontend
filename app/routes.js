@@ -1,12 +1,11 @@
 import React from 'react';
-import { observable, toJS } from 'mobx';
+import { observable } from 'mobx';
 
 const Store = require('electron-store');
 
 const PathsSettings = React.lazy(() => import('./views/settings/PathsSettingsForm'));
 const AlignSettings = React.lazy(() => import('./views/settings/AlignmentSettingsForm'));
 const DetectionSettings = React.lazy(() => import('./views/settings/DetectionSettingsForm'));
-const MaskSettings = React.lazy(() => import('./views/settings/MaskSettingsForm'));
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'));
 const StartNewJob = React.lazy(() => import('./views/newjob/NewJob'));
 const CorrectDetections = React.lazy(() => import('./views/correction/Correction'));
@@ -53,26 +52,14 @@ alignPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
 
 detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     name: "Default",
-    channels: [
-      {"Type":"DIC","index":0},
-      {"Type":"Red","index":1},
-      {"Type":"Green","index":2}
-    ],
+    graychannel: 0,
     boxsize: 200,
     zstack: false,
     video: false,
-    videoSplit: true
+    videoSplit: true,
+    fiji: true,
+    ip: "10.153.168.3:5000",
  })
-
-maskPresetList.set("2166753e-e6e0-4092-b0d1-38e84060033c", {
-    name: "Default",
-    zstack: false,
-    channels: [
-      {"Type":"Green","index":0},
-      {"Type":"Red","index":0},
-      {"Type":"DIC","index":0}
-    ] 
-})
 
 if (typeof store.get('alignment') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('alignment'))) {
@@ -90,14 +77,6 @@ if (typeof store.get('detection') !== 'undefined') {
   }
 }
 
-if (typeof store.get('mask') !== 'undefined') {
-  for (let [key, value] of Object.entries(store.get('mask'))) {
-    if (key !== "2166753e-e6e0-4092-b0d1-38e84060033c") {
-      maskPresetList.set(key, value)
-    }
-  }
-}
-
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
@@ -106,9 +85,8 @@ const routes = [
   { path: '/paths', name: 'Paths Settings', component: PathsSettings, data: pathList },
   { path: '/alignment', name: 'Alignment Settings', component: AlignSettings, data: alignPresetList },
   { path: '/detection', name: 'Detection Settings', component: DetectionSettings, data: detectPresetList },
-  { path: '/mask', name: 'Mask Settings', component: MaskSettings, data: maskPresetList },
 ];
 
-const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { paths: pathList, alignment: alignPresetList, detection: detectPresetList, mask: maskPresetList }}
+const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { paths: pathList, alignment: alignPresetList, detection: detectPresetList }}
 
 export default prop;

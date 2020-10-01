@@ -1,8 +1,8 @@
 {
-  "name": "mitoscanner",
-  "productName": "mitoscanner",
-  "version": "0.6.1",
-  "description": "Electron/React Interface for MitoScanner using BioDetectron",
+  "name": "yeastmate",
+  "productName": "yeastmate",
+  "version": "0.7.1",
+  "description": "YeastMate Electron/React Interface using BioDetectron",
   "main": "./main.prod.js",
   "author": {
     "name": "David Bunk",

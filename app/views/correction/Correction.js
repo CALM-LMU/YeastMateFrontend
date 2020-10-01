@@ -3,6 +3,7 @@ import ReactImageAnnotate from "react-image-annotate"
 
 var fs = require('fs');
 var path = require('path');
+const csv = require('csv-parser')
 
 const { ipcRenderer } = require('electron')
 
@@ -28,19 +29,29 @@ const Correction = () => {
 
   const get_files = (dir) => {
     fs.readdir(dir, function(err, files) {
-      if (files.indexOf('groundtruth.json') !== -1) {
-        console.log(path.join(dir, files[files.indexOf('groundtruth.json')]))
-        setimagePaths(JSON.parse(fs.readFileSync(path.join(dir, files[files.indexOf('groundtruth.json')]))))
-      }
-      else {
         files.forEach(async (file) => {
           if (file.indexOf('.png') !== -1 | file.indexOf('.tif') !== -1 | file.indexOf('.jpg') !== -1) {
             var imageSrc = path.join(dir, file)
+
+            console.log(imageSrc.replace(path.extname(imageSrc), '_predict.csv'))
+
+            fs.exists(imageSrc.replace(path.extname(imageSrc), '_predict.csv'), (exists) => {
+              if (exists) {
+                fs.createReadStream(imageSrc.replace(path.extname(imageSrc), '_predict.csv'))
+                  .pipe(csv())
+                  .on('data', (data) => {
+                    console.log(data)
+                    imagePaths.push({src: imageSrc, name: file})
+                  })
+                  .on('end', () => {
+                    setimagePaths([...imagePaths])
+                  });
+              }
+            })
             imagePaths.push({src: imageSrc, name: file})
             setimagePaths([...imagePaths])
           }
         })
-      }
       imageDir.current = dir
       setimagesLoaded(true)
       setimagesSaved(false)

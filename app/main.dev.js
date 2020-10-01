@@ -12,6 +12,7 @@
  */
 import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
 const os = require('os');
+const upath = require('upath');
 
 const {shell} = require('electron');
 
@@ -74,7 +75,8 @@ app.on('ready', async () => {
     await installExtensions();
   }
 
-  shell.openItem('C:/Users/david/Projects/BioElectron/python/main.exe');
+  console.log(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`))
+  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`));
 
   mainWindow = new BrowserWindow({
     show: false,

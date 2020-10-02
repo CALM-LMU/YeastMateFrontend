@@ -37,8 +37,6 @@ const TheHeader = (props) => {
     props.props.store.set('detection', toJS(props.props.lists.detection))
     props.props.store.set('mask', toJS(props.props.lists.mask))
 
-    console.log(toJS(props.props.lists.alignment))
-
     var window = remote.getCurrentWindow();
     window.close();
   }

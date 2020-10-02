@@ -2,7 +2,7 @@ import React from 'react'
 
 import { observer } from "mobx-react-lite"
 import axios from 'axios';
-const uuidv4 = require("uuid/v4")
+import { v4 as uuidv4 } from 'uuid';
 
 import {
   CButton,

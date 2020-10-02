@@ -30,7 +30,7 @@ import {
 } from '@coreui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-const uuidv4 = require("uuid/v4")
+import { v4 as uuidv4 } from 'uuid';
 
 const cameraFields = [
   { key: 'Channel', _style: { width: '30%'} },
@@ -216,7 +216,7 @@ const AlignmentSettingsForm = (props) => {
       name: NameInput,
       alignment: true,
       videoSplit: true,
-      inputFileFormat: 'nd2',
+      inputFileFormat: '.nd2',
       channels: [
         {"Camera":1,"Channel":1,"DIC":"True","Delete":"Keep"},
         {"Camera":2,"Channel":2,"DIC":"True","Delete":"Delete"},

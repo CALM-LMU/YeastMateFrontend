@@ -75,8 +75,12 @@ app.on('ready', async () => {
     await installExtensions();
   }
 
-  console.log(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`))
-  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`));
+  // if (os.platform() === 'linux') {
+  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
+  // }
+  // if (os.platform() === 'win32') {
+  //   shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`));
+  // }
 
   mainWindow = new BrowserWindow({
     show: false,

@@ -33,7 +33,7 @@ alignPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
   name: "Default",
   alignment: true,
   videoSplit: true,
-  inputFileFormat: 'nd2',
+  inputFileFormat: '.nd2',
   channels: [
     {"Camera":1,"Channel":1,"DIC":"True","Delete":"Keep"},
     {"Camera":2,"Channel":2,"DIC":"True","Delete":"Delete"},

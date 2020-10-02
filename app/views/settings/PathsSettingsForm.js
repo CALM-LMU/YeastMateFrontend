@@ -17,7 +17,7 @@ import { observer } from "mobx-react-lite"
 
 const { dialog } = require('electron').remote;
 
-const uuidv4 = require("uuid/v4")
+import { v4 as uuidv4 } from 'uuid';
 
 const fields = [
   { key: 'Path', _style: { width: '53%'} },

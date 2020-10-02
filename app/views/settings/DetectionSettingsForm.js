@@ -29,8 +29,7 @@ import {
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-const uuidv4 = require("uuid/v4")
-
+import { v4 as uuidv4 } from 'uuid';
 
 const DetectionSettingsForm = (props) => {
   const [modalAdd, setModalAdd] = React.useState(false)
@@ -97,6 +96,10 @@ const DetectionSettingsForm = (props) => {
     props.props.get(selectPresetValue).graychannel = value
   }
 
+  const setboxsize = (value) => {
+    props.props.get(selectPresetValue).boxsize = value
+  }
+
   const setIP = (value) => {
     props.props.get(selectPresetValue).ip = value
   }
@@ -108,6 +111,7 @@ const DetectionSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       graychannel: 0,
+      boxsize: 200,
       video: false,
       videoSplit: true, 
       fiji: true,
@@ -194,7 +198,15 @@ const DetectionSettingsForm = (props) => {
                 <CLabel>Axis of gray (BF/DIC) overview channel.</CLabel>
               </CCol>
               <CCol sm="1">
-                <NumericInput min={0} max={10} step={1} value={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event)}/>
+                <NumericInput min={150} max={500} step={10} value={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event)}/>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="5">
+                <CLabel>Boxsize.</CLabel>
+              </CCol>
+              <CCol sm="1">
+                <NumericInput min={0} max={10} step={1} value={props.props.get(selectPresetValue).boxsize} onChange={(event) => setboxsize(event)}/>
               </CCol>
             </CFormGroup>
             <CFormGroup row>

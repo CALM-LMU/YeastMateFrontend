@@ -49,3 +49,14 @@ main.js.map
 
 .idea
 npm-debug.log.*
+.dockerignore
+.editorconfig
+.eslintignore
+.eslintrc.js
+.flowconfig
+.gitattributes
+.gitignore
+.prettierrc.json
+.gitignore
+.stylelintrc
+.travis.yml

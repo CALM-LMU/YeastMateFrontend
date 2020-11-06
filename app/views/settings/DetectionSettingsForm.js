@@ -1,8 +1,6 @@
 import React from 'react'
 import { observer } from "mobx-react-lite"
 
-import NumericInput from 'react-numeric-input';
-
 import {
   CButton,
   CCard,
@@ -10,9 +8,12 @@ import {
   CCardFooter,
   CCardHeader,
   CCol,
+  CCollapse,
   CForm,
   CFormGroup,
   CInput,
+  CInputGroupPrepend,
+  CInputGroupAppend,
   CLabel,
   CModal,
   CModalFooter,
@@ -32,10 +33,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { v4 as uuidv4 } from 'uuid';
 
 const DetectionSettingsForm = (props) => {
+  const [selectPresetValue, setselectPresetValue] = React.useState("a809ff23-4235-484f-86f2-e5d87da8333d")
   const [modalAdd, setModalAdd] = React.useState(false)
+  const [boxCollapse, setBoxCollapse] = React.useState(props.props.get(selectPresetValue).boxExpansion);
+  const [videoCollapse, setVideoCollapse] = React.useState(props.props.get(selectPresetValue).video);
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
-  const [selectPresetValue, setselectPresetValue] = React.useState("a809ff23-4235-484f-86f2-e5d87da8333d")
 
   const [toasts, setToasts] = React.useState([
     {}
@@ -57,39 +60,17 @@ const DetectionSettingsForm = (props) => {
   }
   
   const switchStack = () => {
-    if (props.props.get(selectPresetValue).zstack === true) {
-      props.props.get(selectPresetValue).zstack = false
-    }
-    else {
-      props.props.get(selectPresetValue).zstack = true
-    }
+    props.props.get(selectPresetValue).zstack = !props.props.get(selectPresetValue).zstack
   }
 
   const switchVideo = () => {
-    if (props.props.get(selectPresetValue).video === true) {
-      props.props.get(selectPresetValue).video = false
-    }
-    else {
-      props.props.get(selectPresetValue).video = true
-    }
+    props.props.get(selectPresetValue).video = !props.props.get(selectPresetValue).video
+    setVideoCollapse(props.props.get(selectPresetValue).video)
   }
 
-  const switchVideoSplit = () => {
-    if (props.props.get(selectPresetValue).videoSplit === true) {
-      props.props.get(selectPresetValue).videoSplit = false
-    }
-    else {
-      props.props.get(selectPresetValue).videoSplit = true
-    }
-  }
-
-  const switchFiji = () => {
-    if (props.props.get(selectPresetValue).fiji === true) {
-      props.props.get(selectPresetValue).fiji = false
-    }
-    else {
-      props.props.get(selectPresetValue).fiji = true
-    }
+  const switchBox = () => {
+    props.props.get(selectPresetValue).boxExpansion = !props.props.get(selectPresetValue).boxExpansion
+    setBoxCollapse(props.props.get(selectPresetValue).boxExpansion)
   }
 
   const setgraychannel = (value) => {
@@ -104,23 +85,28 @@ const DetectionSettingsForm = (props) => {
     props.props.get(selectPresetValue).ip = value
   }
 
+  const handleLocalIPClick = () => {
+    setIP("127.0.0.1:5000")
+  }
+
   const handleAddPreset = () => {
     setModalAdd(false)
 
     const id = uuidv4()
     props.props.set(id, {
       name: NameInput,
-      graychannel: 0,
-      boxsize: 200,
-      video: false,
-      videoSplit: true, 
-      fiji: true,
-      ip: '127.0.0.1:5000'
+      graychannel: props.props.get(selectPresetValue).graychannel,
+      boxsize: props.props.get(selectPresetValue).boxsize,
+      zstack: props.props.get(selectPresetValue).zstack,
+      video: props.props.get(selectPresetValue).video,
+      boxExpansion: props.props.get(selectPresetValue).boxExpansion, 
+      frameSelection: props.props.get(selectPresetValue).frameSelection,
+      ip: props.props.get(selectPresetValue).ip
     })
 
     setselectPresetValue(id)
   };
-
+ 
   const handleRemovePreset = async () => {
     if (selectPresetValue !== "a809ff23-4235-484f-86f2-e5d87da8333d") {
       setModalRemove(false)
@@ -153,70 +139,82 @@ const DetectionSettingsForm = (props) => {
                 )})}
               </CSelect>
             </CFormGroup>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup row>
               <CCol md="5">
-                  <CLabel>Detection on z-stacks?</CLabel>
+                <CLabel>IP address and port of detection server.</CLabel>
               </CCol>
-              <CCol md="5">
+              <CCol sm="5">
+                <CInputGroupPrepend>
+                  <CButton onClick={handleLocalIPClick} type="add" size="sm" color="primary">Set local backend</CButton>
+                  <CInput id="ipInput" onChange={(event) => setIP(event.currentTarget.value)} value={props.props.get(selectPresetValue).ip}></CInput>
+                </CInputGroupPrepend>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="8">
+                <CLabel>Axis of non-fluorescent (BF/DIC/PH) overview channel.</CLabel>
+              </CCol>
+              <CCol sm="2">
+                <CInput type='number' min={0} defaultValue={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event)}/>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="9">
+                  <CLabel>Is the image a z-stack?</CLabel>
+              </CCol>
+              <CCol md="3">
                 <CFormGroup>
                   <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchStack} checked={props.props.get(selectPresetValue).zstack} id="stackYes"/>
                 </CFormGroup>
               </CCol>
             </CFormGroup>
             <CFormGroup row>
-              <CCol md="5">
-                  <CLabel>Detection on videos?</CLabel>
+              <CCol md="9">
+                  <CLabel>Is the image a video?</CLabel>
               </CCol>
-              <CCol md="5">
+              <CCol md="3">
                 <CFormGroup>
                   <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideo} checked={props.props.get(selectPresetValue).video} id="videoYes"/>
                 </CFormGroup>
               </CCol>
             </CFormGroup>
+            <CCollapse show={videoCollapse}>
+              <CFormGroup row>
+                <CCol md="6">
+                    <CLabel>Run detection on each frame seperately or just a specific frame?</CLabel>
+                </CCol>
+                <CCol md="4">
+                  <CFormGroup>
+                    <CSelect custom value={props.props.get(selectPresetValue).frameSelection} name="select" id="selectDetection">
+                      <option value={"all"} name='Detection on all frames'>Detection on all frames</option>
+                      <option value={"first"} name='>Use first frame as reference.'>Use first frame as reference</option>
+                      <option value={"last"} name='Use last frame as reference.'>Use last frame as reference</option>
+                    </CSelect>
+                  </CFormGroup>
+                </CCol>
+              </CFormGroup>
+            </CCollapse>
             <CFormGroup row>
-              <CCol md="5">
-                  <CLabel>Split videos into single files?</CLabel>
+              <CCol md="9">
+                  <CLabel>Expand detected bounding boxes to set static size?</CLabel>
               </CCol>
-              <CCol md="5">
+              <CCol md="3">
                 <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchBox} checked={props.props.get(selectPresetValue).boxExpansion} id="boxYes"/>
                 </CFormGroup>
               </CCol>
             </CFormGroup>
-            <CFormGroup row>
-              <CCol md="5">
-                  <CLabel>Convert into Fiji-compatible image format?</CLabel>
-              </CCol>
-              <CCol md="5">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchFiji} checked={props.props.get(selectPresetValue).fiji} id="fijiYes"/>
-                </CFormGroup>
-              </CCol>
-            </CFormGroup>
-            <CFormGroup row>
-              <CCol md="5">
-                <CLabel>Axis of gray (BF/DIC) overview channel.</CLabel>
-              </CCol>
-              <CCol sm="1">
-                <NumericInput min={150} max={500} step={10} value={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event)}/>
-              </CCol>
-            </CFormGroup>
-            <CFormGroup row>
-              <CCol md="5">
-                <CLabel>Boxsize.</CLabel>
-              </CCol>
-              <CCol sm="1">
-                <NumericInput min={0} max={10} step={1} value={props.props.get(selectPresetValue).boxsize} onChange={(event) => setboxsize(event)}/>
-              </CCol>
-            </CFormGroup>
-            <CFormGroup row>
-              <CCol md="5">
-                <CLabel>IP address and port of detection server.</CLabel>
-              </CCol>
-              <CCol sm="6">
-                <CInput id="ipInput" onChange={(event) => setIP(event.currentTarget.value)} value={props.props.get(selectPresetValue).ip}></CInput>
-              </CCol>
-            </CFormGroup>
+            <CCollapse show={boxCollapse}> 
+              <CFormGroup row>
+                <CCol md="7">
+                  <CLabel>Size of cropped boxes around detected objects.</CLabel>
+                </CCol>
+                <CCol md="3">
+                  <CInput type='number' min={10} step={5} defaultValue={props.props.get(selectPresetValue).boxsize} onChange={(event) => setboxsize(event)}/>
+                </CCol>
+              </CFormGroup>
+            </CCollapse>
           </CForm>
           <CModal 
               show={modalAdd} 

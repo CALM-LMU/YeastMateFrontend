@@ -11,6 +11,7 @@ import {
   CCardHeader,
   CCardText,
   CCol,
+  CCollapse,
   CDataTable,
   CForm,
   CFormGroup,
@@ -34,8 +35,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 const cameraFields = [
   { key: 'Channel', _style: { width: '30%'} },
-  { key: 'DIC', _style: { width: '10%'} },
   { key: 'Camera', _style: { width: '10%'} },
+  { key: 'Reference channel', _style: { width: '10%'} },
   { key: 'Delete', _style: { width: '15%'} },
   {
     key: 'toggle',
@@ -58,7 +59,7 @@ const dimensionFields = [
   }
 ]
 
-const getDICBadge = (DIC)=>{
+const getDICBadge = (DIC) => {
   switch (DIC) {
     case "True": return 'success'
     case "False": return 'secondary'
@@ -66,7 +67,7 @@ const getDICBadge = (DIC)=>{
   }
 }
 
-const getCameraBadge = (Camera)=>{
+const getCameraBadge = (Camera) => {
   switch (Camera) {
     case 1: return 'warning'
     case 2: return 'info'
@@ -74,7 +75,7 @@ const getCameraBadge = (Camera)=>{
   }
 }
 
-const getDeleteBadge = (Delete)=>{
+const getDeleteBadge = (Delete) => {
   switch (Delete) {
     case 'Keep': return 'secondary'
     case 'Delete': return 'danger'
@@ -82,7 +83,7 @@ const getDeleteBadge = (Delete)=>{
   }
 }
 
-const getDimensionBadge = (status)=>{
+const getDimensionBadge = (status) => {
   switch (status) {
     case 'Existing': return 'success'
     case 'Not Existing': return 'secondary'
@@ -94,6 +95,7 @@ const AlignmentSettingsForm = (props) => {
   const [modalAdd, setModalAdd] = React.useState(false)
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
+  const [collapse, setCollapse] = React.useState(false);
   const [selectPresetValue, setselectPresetValue] = React.useState("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed")
 
   const [toasts, setToasts] = React.useState([
@@ -190,21 +192,7 @@ const AlignmentSettingsForm = (props) => {
   };
 
   const switchAlignment = () => {
-    if (props.props.get(selectPresetValue).alignment === true) {
-      props.props.get(selectPresetValue).alignment = false
-    }
-    else {
-      props.props.get(selectPresetValue).alignment = true
-    }
-  }
-
-  const switchVideo = () => {
-    if (props.props.get(selectPresetValue).videoSplit === true) {
-      props.props.get(selectPresetValue).videoSplit = false
-    }
-    else {
-      props.props.get(selectPresetValue).videoSplit = true
-    }
+    props.props.get(selectPresetValue).alignment = !props.props.get(selectPresetValue).alignment
   }
 
   const handleAddPreset = () => {
@@ -215,7 +203,6 @@ const AlignmentSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       alignment: true,
-      videoSplit: true,
       inputFileFormat: '.nd2',
       channels: [
         {"Camera":1,"Channel":1,"DIC":"True","Delete":"Keep"},
@@ -249,14 +236,23 @@ const AlignmentSettingsForm = (props) => {
     }
   }; 
 
+  React.useEffect(() => {
+    if (props.props.get(selectPresetValue).inputFileFormat === '.nd2') {
+      setCollapse(false)
+    }
+    else if (props.props.get(selectPresetValue).inputFileFormat === '.tif') {
+      setCollapse(true)
+    }
+  }, [props.props.get(selectPresetValue).inputFileFormat])
+
   return (
     <>
       <CCard>
-        <CCardHeader>Alignment Settings</CCardHeader>
+        <CCardHeader>Preprocessing Settings</CCardHeader>
         <CCardBody >
           <CForm encType="multipart/form-data" className="form-horizontal">
             <CFormGroup>
-              <CLabel>Select Alignment Preset</CLabel>
+              <CLabel>Select Processing Preset</CLabel>
               <CSelect value={selectPresetValue} onChange={(event) => setselectPresetValue(event.currentTarget.value)} custom id="selectPreset">
                 {Array.from( props.props ).map(([key, value]) => {
                   return props.props.get(key).name &&
@@ -269,6 +265,19 @@ const AlignmentSettingsForm = (props) => {
                 )})}
               </CSelect>
             </CFormGroup>
+            <CFormGroup>
+              <CLabel>Preprocessing will convert nd2 or tif files into detection-compatible tif files.</CLabel>
+            </CFormGroup>
+            <CFormGroup>
+              <CLabel>Select input image file type.</CLabel>
+              <CSelect onChange={(event) => props.props.get(selectPresetValue).inputFileFormat = event.currentTarget.value} value={props.props.get(selectPresetValue).inputFileFormat} custom name="select" id="select">
+                <option>.nd2</option>
+                <option>.tif</option>
+              </CSelect>
+            </CFormGroup>
+            <CFormGroup>
+              <CLabel>It can also perform additional alignment of different image channels if they were acquired with multiple microscope cameras.</CLabel>
+            </CFormGroup>
             <CFormGroup row>
               <CCol md="3">
                   <CLabel>Perform alignment?</CLabel>
@@ -280,25 +289,8 @@ const AlignmentSettingsForm = (props) => {
               </CCol>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Select input image file type.</CLabel>
-              <CSelect onChange={(event) => props.props.get(selectPresetValue).inputFileFormat = event.currentTarget.value} value={props.props.get(selectPresetValue).inputFileFormat} custom name="select" id="select">
-                <option>.nd2</option>
-                <option>.tif</option>
-              </CSelect>
-            </CFormGroup>
-            <CFormGroup row>
-              <CCol md="3">
-                  <CLabel>Split videos into single files?</CLabel>
-              </CCol>
-              <CCol md="9">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideo} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
-                </CFormGroup>
-              </CCol>
-            </CFormGroup>
-            <CFormGroup>
               <CCardText>
-                Add channels and select their camera.
+                Select which channels belong to which camera, and which ones to use for alignment.
               </CCardText>
               <CDataTable
                 items={props.props.get(selectPresetValue).channels}
@@ -306,7 +298,7 @@ const AlignmentSettingsForm = (props) => {
                 itemsPerPage={100}
                 hover
                 scopedSlots = {{
-                  'DIC':
+                  'Reference channel':
                     (item)=>(
                       <td>
                         <CBadge color={getDICBadge(item.DIC)}>
@@ -346,52 +338,55 @@ const AlignmentSettingsForm = (props) => {
                           </CButtonGroup>
                       )
                     }
+                  }
+                }
+              />
+              <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
+                <FontAwesomeIcon icon="plus"/>   Add Channel
+              </CButton>
+              <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm">
+                <FontAwesomeIcon icon="ban"/>   Remove Channel
+              </CButton>
+            </CFormGroup>
+            <CCollapse show={collapse}>
+              <CFormGroup>
+                <CLabel>Select the order of dimensions within the tiff stack.</CLabel>
+              </CFormGroup>
+              <CFormGroup>
+                <CDataTable
+                items={props.props.get(selectPresetValue).dimensions}
+                fields={dimensionFields}
+                itemsPerPage={10}
+                hover
+                scopedSlots = {{
+                  'status':
+                    (item)=>(
+                      <td>
+                        <CBadge color={getDimensionBadge(item.status)}>
+                          {item.status}
+                        </CBadge>
+                      </td>
+                    ),
+                    'toggle':
+                      (item, index)=>{
+                        return (
+                          <CButtonGroup>
+                            <CButton onClick={()=>{toggleDimensionStatus(index)}} color="dark" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="sync"/>   Toggle Status
+                            </CButton>
+                            <CButton onClick={()=>{handleUp(index)}} color="dark" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="arrow-up"/>   Move Up
+                            </CButton>
+                            <CButton onClick={()=>{handleDown(index)}} color="dark" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="arrow-down"/>   Move Down
+                            </CButton>
+                          </CButtonGroup>
+                      )
+                    }
                   }}
                 />
-                <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
-                  <FontAwesomeIcon icon="plus"/>   Add Channel
-                </CButton>
-                <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm">
-                  <FontAwesomeIcon icon="ban"/>   Remove Channel
-                </CButton>
               </CFormGroup>
-            <CFormGroup>
-              <CLabel></CLabel>
-            </CFormGroup>
-            <CFormGroup>
-              <CDataTable
-              items={props.props.get(selectPresetValue).dimensions}
-              fields={dimensionFields}
-              itemsPerPage={10}
-              hover
-              scopedSlots = {{
-                'status':
-                  (item)=>(
-                    <td>
-                      <CBadge color={getDimensionBadge(item.status)}>
-                        {item.status}
-                      </CBadge>
-                    </td>
-                  ),
-                  'toggle':
-                    (item, index)=>{
-                      return (
-                        <CButtonGroup>
-                          <CButton onClick={()=>{toggleDimensionStatus(index)}} color="dark" size="sm" variant="outline">
-                            <FontAwesomeIcon icon="sync"/>   Toggle Status
-                          </CButton>
-                          <CButton onClick={()=>{handleUp(index)}} color="dark" size="sm" variant="outline">
-                            <FontAwesomeIcon icon="arrow-up"/>   Move Up
-                          </CButton>
-                          <CButton onClick={()=>{handleDown(index)}} color="dark" size="sm" variant="outline">
-                            <FontAwesomeIcon icon="arrow-down"/>   Move Down
-                          </CButton>
-                        </CButtonGroup>
-                    )
-                  }
-                }}
-              />
-            </CFormGroup>
+            </CCollapse>
           </CForm>
           <CModal 
             show={modalAdd} 

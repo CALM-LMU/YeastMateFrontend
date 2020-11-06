@@ -23,13 +23,7 @@ export default [
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Paths',
-    to: '/paths',
-    icon: 'cil-align-left',
-  },
-  {
-    _tag: 'CSidebarNavItem',
-    name: 'Alignment',
+    name: 'Preprocessing',
     to: '/alignment',
     icon: 'cil-align-left',
   },
@@ -37,6 +31,12 @@ export default [
     _tag: 'CSidebarNavItem',
     name: 'Detection',
     to: '/detection',
+    icon: 'cil-align-left',
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Export',
+    to: '/export',
     icon: 'cil-align-left',
   },
   {

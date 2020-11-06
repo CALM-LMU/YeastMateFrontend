@@ -32,10 +32,8 @@ const TheHeader = (props) => {
   }
 
   const closeWin = () => {
-    props.props.store.set('paths', toJS(props.props.lists.paths))
     props.props.store.set('alignment', toJS(props.props.lists.alignment))
     props.props.store.set('detection', toJS(props.props.lists.detection))
-    props.props.store.set('mask', toJS(props.props.lists.mask))
 
     var window = remote.getCurrentWindow();
     window.close();

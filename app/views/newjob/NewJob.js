@@ -3,6 +3,8 @@ import React from 'react'
 import { observer } from "mobx-react-lite"
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+const path = require('path');
+const { dialog } = require('electron').remote;
 
 import {
   CButton,
@@ -12,6 +14,8 @@ import {
   CCardHeader,
   CForm,
   CFormGroup,
+  CInput,
+  CInputGroupAppend,
   CLabel,
   CSelect,
   CToast,
@@ -22,9 +26,18 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const NewJob = (props) => {
-  const [toasts, setToasts] = React.useState([
-    {}
-  ])
+  const [toasts, setToasts] = React.useState([{}])
+  const [pathInput, setPathInput] = React.useState("")
+
+  const handleAddPathClick = () => {
+    var selectedPath = dialog.showOpenDialog({
+      properties: ['openDirectory']
+    });
+
+    if (typeof path !== 'undefined') {
+      setPathInput(selectedPath[0])
+    }
+  };
 
   const toasters = (()=>{
     return toasts.reduce((toasters, toast) => {
@@ -46,9 +59,10 @@ const NewJob = (props) => {
       'http://127.0.0.1:5005/',
       {
         _id: uuidv4(),
-        path: document.getElementById("selectPath").value,
+        path: path.normalize(pathInput),
         align: props.props.alignment.get(document.getElementById("selectAlign").value),
         detect: props.props.detection.get(document.getElementById("selectDetection").value),
+        export: props.props.detection.get(document.getElementById("selectExport").value),
       }
     ).then(function (response) {
       addToast('Success', 'Job succesfully submitted to server.');
@@ -67,20 +81,14 @@ const NewJob = (props) => {
         <CCardBody>
           <CForm>
             <CFormGroup>
-              <CLabel>Select the mounted folder to your data. If your folder has not been mounted yet, mount it under Paths Settings</CLabel>
-              <CSelect custom name="select" id="selectPath">
-                {props.props.paths.get('pathList').map((path, idx) => {
-                    return path &&
-                    (<option
-                    value={path.Path}
-                    >
-                      {path.Path}
-                    </option>
-                  )})}
-              </CSelect>
+              <CLabel>Path:</CLabel>
+              <CInputGroupAppend>
+                <CInput id="pathInput" onChange={(event) => setPathInput(event.currentTarget.value)} value={pathInput}></CInput>
+                <CButton type="add" onClick={handleAddPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
+              </CInputGroupAppend>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Select your settings preset. You can set your preset at the respective settings sites.</CLabel>
+              <CLabel>Select your preprocessing preset if you want to align or load nd2 files.</CLabel>
               <CSelect custom name="select" id="selectAlign">
                 <option
                   value={null}
@@ -100,8 +108,29 @@ const NewJob = (props) => {
               </CSelect>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Detection Preset.</CLabel>
+              <CLabel>Select your preset for detecting cells.</CLabel>
               <CSelect custom name="select" id="selectDetection">
+                <option
+                  value={null}
+                  name='No detection'
+                  >
+                    No detection
+                </option>
+                {Array.from( props.props.detection ).map(([key, value]) => {
+                    return props.props.detection.get(key).name &&
+                    (<option
+                    selected
+                    value={key}
+                    name={props.props.detection.get(key).name}
+                    >
+                      {props.props.detection.get(key).name}
+                    </option>
+                  )})}
+              </CSelect>
+            </CFormGroup>
+            <CFormGroup>
+              <CLabel>Select your preset for exporting detections.</CLabel>
+              <CSelect custom name="select" id="selectExport">
                 <option
                   value={null}
                   name='No detection'

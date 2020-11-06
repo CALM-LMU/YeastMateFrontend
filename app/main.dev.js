@@ -76,10 +76,10 @@ app.on('ready', async () => {
   }
 
   // if (os.platform() === 'linux') {
-  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
+  //shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
   // }
   // if (os.platform() === 'win32') {
-  //   shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`));
+  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`));
   // }
 
   mainWindow = new BrowserWindow({

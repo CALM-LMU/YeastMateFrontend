@@ -3,7 +3,7 @@ import { observable } from 'mobx';
 
 const Store = require('electron-store');
 
-const AlignSettings = React.lazy(() => import('./views/settings/AlignmentSettingsForm'));
+const PreprocessingSettings = React.lazy(() => import('./views/settings/PreprocessingSettingsForm'));
 const DetectionSettings = React.lazy(() => import('./views/settings/DetectionSettingsForm'));
 const ExportSettings = React.lazy(() => import('./views/settings/ExportSettingsForm'));
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'));
@@ -13,13 +13,14 @@ const CorrectDetections = React.lazy(() => import('./views/correction/Correction
 const store = new Store();
 
 var sidebarShow = observable(new Map())
-var alignPresetList = observable(new Map())
+var presetSelection = observable(new Map())
+var preprocessingPresetList = observable(new Map())
 var detectPresetList = observable(new Map())
 var exportPresetList = observable(new Map())
 
 sidebarShow.set('show', 'responsive')
 
-alignPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
+preprocessingPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
   name: "Default",
   alignment: true,
   inputFileFormat: '.nd2',
@@ -53,17 +54,18 @@ detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
 exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
   name: "Default",
   crop: true,
-  mask: true,
   classes: [
     {"Class ID":1,"Tag":"single_cell","Crop":"False", "Mask": "False"},
     {"Class ID":2,"Tag":"mating","Crop":"True", "Mask": "True"},
-  ]
+  ],
+  videoSplit: false,
+  scoreThreshold: 0.5
 })
 
-if (typeof store.get('alignment') !== 'undefined') {
-  for (let [key, value] of Object.entries(store.get('alignment'))) {
+if (typeof store.get('preprocessing') !== 'undefined') {
+  for (let [key, value] of Object.entries(store.get('preprocessing'))) {
     if (key !== "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed") {
-      alignPresetList.set(key, value)
+      preprocessingPresetList.set(key, value)
     }
   }
 }
@@ -84,16 +86,27 @@ if (typeof store.get('export') !== 'undefined') {
   }
 }
 
+if (typeof store.get('selection') !== 'undefined') {
+  for (let [key, value] of Object.entries(store.get('selection'))) {
+    presetSelection.set(key, value)
+  }
+}
+else {
+  presetSelection.set('preprocessing', null)
+  presetSelection.set('detection', "a809ff23-4235-484f-86f2-e5d87da8333d")
+  presetSelection.set('export', null)
+}
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
-  { path: '/job', name: 'New Job', component: StartNewJob, data: { alignment: alignPresetList, detection: detectPresetList, export: exportPresetList} },
+  { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
   { path: '/correct', name: 'Correct detections', component: CorrectDetections },
-  { path: '/alignment', name: 'Alignment Settings', component: AlignSettings, data: alignPresetList },
+  { path: '/preprocessing', name: 'Preprocessing Settings', component: PreprocessingSettings, data: preprocessingPresetList },
   { path: '/detection', name: 'Detection Settings', component: DetectionSettings, data: detectPresetList },
   { path: '/export', name: 'Export Settings', component: ExportSettings, data: exportPresetList },
 ];
 
-const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { alignment: alignPresetList, detection: detectPresetList, export: exportPresetList }}
+const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
 
 export default prop;

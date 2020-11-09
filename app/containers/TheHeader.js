@@ -32,8 +32,10 @@ const TheHeader = (props) => {
   }
 
   const closeWin = () => {
-    props.props.store.set('alignment', toJS(props.props.lists.alignment))
+    props.props.store.set('selection', toJS(props.props.lists.selection))
+    props.props.store.set('preprocessing', toJS(props.props.lists.preprocessing))
     props.props.store.set('detection', toJS(props.props.lists.detection))
+    props.props.store.set('export', toJS(props.props.lists.export))
 
     var window = remote.getCurrentWindow();
     window.close();

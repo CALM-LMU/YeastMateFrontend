@@ -89,6 +89,10 @@ const DetectionSettingsForm = (props) => {
     setIP("127.0.0.1:5000")
   }
 
+  const setFrameSelection = (value) => {
+    props.props.get(selectPresetValue).frameSelection = value
+  }
+
   const handleAddPreset = () => {
     setModalAdd(false)
 
@@ -171,7 +175,7 @@ const DetectionSettingsForm = (props) => {
             </CFormGroup>
             <CFormGroup row>
               <CCol md="9">
-                  <CLabel>Is the image a video?</CLabel>
+                  <CLabel>Is the image a time-series?</CLabel>
               </CCol>
               <CCol md="3">
                 <CFormGroup>
@@ -186,7 +190,7 @@ const DetectionSettingsForm = (props) => {
                 </CCol>
                 <CCol md="4">
                   <CFormGroup>
-                    <CSelect custom value={props.props.get(selectPresetValue).frameSelection} name="select" id="selectDetection">
+                    <CSelect custom onChange={(event) => setFrameSelection(event.currentTarget.value)} value={props.props.get(selectPresetValue).frameSelection} name="select" id="selectDetection">
                       <option value={"all"} name='Detection on all frames'>Detection on all frames</option>
                       <option value={"first"} name='>Use first frame as reference.'>Use first frame as reference</option>
                       <option value={"last"} name='Use last frame as reference.'>Use last frame as reference</option>
@@ -227,7 +231,7 @@ const DetectionSettingsForm = (props) => {
               <CInput id="nameInput" onChange={(event) => setNameInput(event.currentTarget.value)} value={NameInput}></CInput>
             </CModalBody>
             <CModalFooter>
-              <CButton onClick={handleAddPreset} color="primary"><FontAwesomeIcon icon="plus" />   Add Preset</CButton>{' '}
+              <CButton onClick={handleAddPreset} color="primary"><FontAwesomeIcon icon="plus" />   Add Preset</CButton>
               <CButton 
                 color="secondary" 
                 onClick={() => setModalAdd(false)}

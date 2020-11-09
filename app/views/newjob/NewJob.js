@@ -54,21 +54,33 @@ const NewJob = (props) => {
     ])
   }
 
+  const handlePreprocessingSelection = (value) => {
+    props.props.selection.set('preprocessing', value)
+  }
+
+  const handleDetectionSelection = (value) => {
+    props.props.selection.set('detection', value)
+  }
+
+  const handleExportSelection = (value) => {
+    props.props.selection.set('export', value)
+  }
+
   const submitJob = () => {
     axios.post(
       'http://127.0.0.1:5005/',
       {
         _id: uuidv4(),
         path: path.normalize(pathInput),
-        align: props.props.alignment.get(document.getElementById("selectAlign").value),
-        detect: props.props.detection.get(document.getElementById("selectDetection").value),
-        export: props.props.detection.get(document.getElementById("selectExport").value),
+        preprocessing: props.props.preprocessing.get(props.props.selection.get('preprocessing')),
+        detection: props.props.detection.get(props.props.selection.get('detection')),
+        export: props.props.export.get(props.props.selection.get('export')),
       }
     ).then(function (response) {
-      addToast('Success', 'Job succesfully submitted to server.');
+      addToast('Success', 'Job succesfully submitted to backend.');
     })
     .catch(function (error) {
-      addToast('Error', 'Job could not be sent to server. A bug report was sent.');
+      addToast('Error', 'Job could not be sent to backend.');
     })
   };
 
@@ -89,27 +101,27 @@ const NewJob = (props) => {
             </CFormGroup>
             <CFormGroup>
               <CLabel>Select your preprocessing preset if you want to align or load nd2 files.</CLabel>
-              <CSelect custom name="select" id="selectAlign">
+              <CSelect value={props.props.selection.get('preprocessing')} onChange={(event) => handlePreprocessingSelection(event.currentTarget.value)} custom name="select" id="selectPreprocessing">
                 <option
                   value={null}
-                  name='No alignment'
+                  name='No Preprocessing'
                   >
-                    No alignment
+                    No Preprocessing
                 </option>
-                {Array.from( props.props.alignment ).map(([key, value]) => {
-                    return props.props.alignment.get(key).name &&
+                {Array.from( props.props.preprocessing ).map(([key, value]) => {
+                    return props.props.preprocessing.get(key).name &&
                     (<option
                     value={key}
-                    name={props.props.alignment.get(key).name}
+                    name={props.props.preprocessing.get(key).name}
                     >
-                      {props.props.alignment.get(key).name}
+                      {props.props.preprocessing.get(key).name}
                     </option>
                   )})}
               </CSelect>
             </CFormGroup>
             <CFormGroup>
               <CLabel>Select your preset for detecting cells.</CLabel>
-              <CSelect custom name="select" id="selectDetection">
+              <CSelect value={props.props.selection.get('detection')} onChange={(event) => handleDetectionSelection(event.currentTarget.value)} custom name="select" id="selectDetection">
                 <option
                   value={null}
                   name='No detection'
@@ -119,7 +131,6 @@ const NewJob = (props) => {
                 {Array.from( props.props.detection ).map(([key, value]) => {
                     return props.props.detection.get(key).name &&
                     (<option
-                    selected
                     value={key}
                     name={props.props.detection.get(key).name}
                     >
@@ -130,20 +141,20 @@ const NewJob = (props) => {
             </CFormGroup>
             <CFormGroup>
               <CLabel>Select your preset for exporting detections.</CLabel>
-              <CSelect custom name="select" id="selectExport">
+              <CSelect value={props.props.selection.get('export')} onChange={(event) => handleExportSelection(event.currentTarget.value)} custom name="select" id="selectExport">
                 <option
                   value={null}
-                  name='No detection'
+                  name='No export'
                   >
-                    No detection
+                    No export
                 </option>
-                {Array.from( props.props.detection ).map(([key, value]) => {
-                    return props.props.detection.get(key).name &&
+                {Array.from( props.props.export ).map(([key, value]) => {
+                    return props.props.export.get(key).name &&
                     (<option
                     value={key}
-                    name={props.props.detection.get(key).name}
+                    name={props.props.export.get(key).name}
                     >
-                      {props.props.detection.get(key).name}
+                      {props.props.export.get(key).name}
                     </option>
                   )})}
               </CSelect>

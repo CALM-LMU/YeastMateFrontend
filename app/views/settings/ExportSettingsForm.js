@@ -36,7 +36,9 @@ import { v4 as uuidv4 } from 'uuid';
 const ExportSettingsForm = (props) => {
   const [selectPresetValue, setselectPresetValue] = React.useState("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f")
   const [modalAdd, setModalAdd] = React.useState(false)
-  const [cropCollapse, setCropCollapse] = React.useState(props.props.get(selectPresetValue).crop);
+  const [cropCollapse, setCropCollapse] = React.useState(props.props.get(selectPresetValue).crop)
+  const [videoCollapse, setVideoCollapse] = React.useState(props.props.get(selectPresetValue).video)
+  const [tmpVideoSplit, setTmpVideoSplit] = React.useState(props.props.get(selectPresetValue).videoSplit)
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
 
@@ -93,6 +95,28 @@ const ExportSettingsForm = (props) => {
     setCropCollapse(props.props.get(selectPresetValue).crop)
   }
 
+  const switchVideo = () => {
+    props.props.get(selectPresetValue).video = !props.props.get(selectPresetValue).video
+
+    if (props.props.get(selectPresetValue).video === 'True') {
+      props.props.get(selectPresetValue).videoSplit = tmpVideoSplit
+    }
+    else if (props.props.get(selectPresetValue).video === 'False') {
+      setTmpVideoSplit(props.props.get(selectPresetValue).videoSplit)
+      props.props.get(selectPresetValue).videoSplit = false
+    }
+
+    setVideoCollapse(props.props.get(selectPresetValue).video)
+  }
+
+  const switchVideoSplit = () => {
+    props.props.get(selectPresetValue).videoSplit = !props.props.get(selectPresetValue).videoSplit
+  }
+
+  const setScoreThreshold =(value) => {
+    props.props.get(selectPresetValue).scoreThreshold = value
+  }
+
   const setTag = (index, value) => {
       props.props.get(selectPresetValue).classes[index].Tag = value
       props.props.get(selectPresetValue).classes = [...props.props.get(selectPresetValue).classes]
@@ -138,8 +162,9 @@ const ExportSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       crop: props.props.get(selectPresetValue).crop,
-      mask: props.props.get(selectPresetValue).mask,
-      classes: props.props.get(selectPresetValue).classes
+      classes: props.props.get(selectPresetValue).classes,
+      videoSplit: props.props.get(selectPresetValue).videoSplit,
+      scoreThreshold: props.props.get(selectPresetValue).scoreThreshold
     })
 
     setselectPresetValue(id)
@@ -241,7 +266,38 @@ const ExportSettingsForm = (props) => {
                   <FontAwesomeIcon icon="ban"/>   Remove Channel
                 </CButton>
               </CFormGroup>
+              <CFormGroup><CLabel></CLabel></CFormGroup>
             </CCollapse>
+            <CFormGroup row>
+              <CCol md="9">
+                  <CLabel>Is the image a time-series?</CLabel>
+              </CCol>
+              <CCol md="3">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideo} checked={props.props.get(selectPresetValue).video} id="videoYes"/>
+                </CFormGroup>
+              </CCol>
+            </CFormGroup>
+            <CCollapse show={videoCollapse}>
+              <CFormGroup row>
+                <CCol md="9">
+                    <CLabel>Save time-series frames as separate files (if image is a time-series)</CLabel>
+                </CCol>
+                <CCol md="3">
+                  <CFormGroup>
+                    <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
+                  </CFormGroup>
+                </CCol>
+              </CFormGroup>
+            </CCollapse>
+            <CFormGroup row>
+                <CCol md="7">
+                  <CLabel>Set threshold of detection score for exporting objects (between 0 and 1)</CLabel>
+                </CCol>
+                <CCol md="3">
+                  <CInput type='number' min={0} max={1} step={0.05} defaultValue={props.props.get(selectPresetValue).scoreThreshold} onChange={(event) => setScoreThreshold(event)}/>
+                </CCol>
+              </CFormGroup>
           </CForm>
           <CModal 
               show={modalAdd} 

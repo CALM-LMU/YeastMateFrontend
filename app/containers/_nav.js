@@ -24,7 +24,7 @@ export default [
   {
     _tag: 'CSidebarNavItem',
     name: 'Preprocessing',
-    to: '/alignment',
+    to: '/preprocessing',
     icon: 'cil-align-left',
   },
   {

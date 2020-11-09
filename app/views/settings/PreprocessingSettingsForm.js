@@ -91,7 +91,7 @@ const getDimensionBadge = (status) => {
   }
 }
 
-const AlignmentSettingsForm = (props) => {
+const PreprocessingSettingsForm = (props) => {
   const [modalAdd, setModalAdd] = React.useState(false)
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
@@ -457,4 +457,4 @@ const AlignmentSettingsForm = (props) => {
   )
 }
 
-export default observer(AlignmentSettingsForm)
+export default observer(PreprocessingSettingsForm)

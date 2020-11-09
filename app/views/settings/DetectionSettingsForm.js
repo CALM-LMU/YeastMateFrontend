@@ -150,7 +150,7 @@ const DetectionSettingsForm = (props) => {
               </CCol>
               <CCol sm="5">
                 <CInputGroupPrepend>
-                  <CButton onClick={handleLocalIPClick} type="add" size="sm" color="primary">Set local backend</CButton>
+                  <CButton onClick={handleLocalIPClick} size="sm" color="primary">Set local backend</CButton>
                   <CInput id="ipInput" onChange={(event) => setIP(event.currentTarget.value)} value={props.props.get(selectPresetValue).ip}></CInput>
                 </CInputGroupPrepend>
               </CCol>

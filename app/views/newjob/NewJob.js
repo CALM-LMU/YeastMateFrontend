@@ -96,7 +96,7 @@ const NewJob = (props) => {
               <CLabel>Path:</CLabel>
               <CInputGroupAppend>
                 <CInput id="pathInput" onChange={(event) => setPathInput(event.currentTarget.value)} value={pathInput}></CInput>
-                <CButton type="add" onClick={handleAddPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
+                <CButton onClick={handleAddPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
               </CInputGroupAppend>
             </CFormGroup>
             <CFormGroup>

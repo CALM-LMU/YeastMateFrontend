@@ -79,7 +79,8 @@ app.on('ready', async () => {
   //shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
   // }
   // if (os.platform() === 'win32') {
-  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend.exe`));
+  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateIO/YeastMateIO.exe`));
+  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateDetector/YeastMateDetector.exe`));
   // }
 
   mainWindow = new BrowserWindow({

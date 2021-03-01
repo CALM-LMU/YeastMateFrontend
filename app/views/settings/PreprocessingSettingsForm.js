@@ -33,6 +33,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { v4 as uuidv4 } from 'uuid';
 
+const osmanBuild = true;
+
 const cameraFields = [
   { key: 'Channel', _style: { width: '30%'} },
   { key: 'Camera', _style: { width: '10%'} },
@@ -92,11 +94,12 @@ const getDimensionBadge = (status) => {
 }
 
 const PreprocessingSettingsForm = (props) => {
+  const [selectPresetValue, setselectPresetValue] = React.useState("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed")
   const [modalAdd, setModalAdd] = React.useState(false)
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
-  const [collapse, setCollapse] = React.useState(false);
-  const [selectPresetValue, setselectPresetValue] = React.useState("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed")
+  const [alignCollapse, setAlignCollapse] = React.useState(props.props.get(selectPresetValue).alignment);
+  const [tifCollapse, setTifCollapse] = React.useState(false);
 
   const [toasts, setToasts] = React.useState([
     {}
@@ -193,7 +196,13 @@ const PreprocessingSettingsForm = (props) => {
 
   const switchAlignment = () => {
     props.props.get(selectPresetValue).alignment = !props.props.get(selectPresetValue).alignment
+    
+    setAlignCollapse(props.props.get(selectPresetValue).alignment)
   }
+
+  const switchVideoSplit = () => {
+    props.props.get(selectPresetValue).videoSplit = !props.props.get(selectPresetValue).videoSplit
+    }
 
   const handleAddPreset = () => {
     setModalAdd(false)
@@ -202,22 +211,11 @@ const PreprocessingSettingsForm = (props) => {
 
     props.props.set(id, {
       name: NameInput,
-      alignment: true,
-      inputFileFormat: '.nd2',
-      channels: [
-        {"Camera":1,"Channel":1,"DIC":"True","Delete":"Keep"},
-        {"Camera":2,"Channel":2,"DIC":"True","Delete":"Delete"},
-        {"Camera":1,"Channel":3,"DIC":"False","Delete":"Keep"},
-        {"Camera":2,"Channel":4,"DIC":"False","Delete":"Keep"}
-      ],
-      dimensions: [
-        {"Dimension":"FOV","index":0,"status":"Existing"},
-        {"Dimension":"Time","index":1,"status":"Existing"},
-        {"Dimension":"Z-Stack","index":2,"status":"Existing"},
-        {"Dimension":"Channels","index":3,"status":"Existing"},
-        {"Dimension":"Height","index":4,"status":"Existing"},
-        {"Dimension":"Width","index":5,"status":"Existing"}
-      ] 
+      alignment: props.props.get(selectPresetValue).alignment,
+      inputFileFormat: props.props.get(selectPresetValue).inputFileFormat,
+      videoSplit: props.props.get(selectPresetValue).videoSplit,
+      channels: props.props.get(selectPresetValue).channels,
+      dimensions: props.props.get(selectPresetValue).dimensions
     })
 
     setselectPresetValue(id)
@@ -238,10 +236,10 @@ const PreprocessingSettingsForm = (props) => {
 
   React.useEffect(() => {
     if (props.props.get(selectPresetValue).inputFileFormat === '.nd2') {
-      setCollapse(false)
+      setTifCollapse(false)
     }
     else if (props.props.get(selectPresetValue).inputFileFormat === '.tif') {
-      setCollapse(true)
+      setTifCollapse(true)
     }
   }, [props.props.get(selectPresetValue).inputFileFormat])
 
@@ -265,6 +263,7 @@ const PreprocessingSettingsForm = (props) => {
                 )})}
               </CSelect>
             </CFormGroup>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup>
               <CLabel>Preprocessing will convert nd2 or tif files into detection-compatible tif files.</CLabel>
             </CFormGroup>
@@ -275,6 +274,7 @@ const PreprocessingSettingsForm = (props) => {
                 <option>.tif</option>
               </CSelect>
             </CFormGroup>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup>
               <CLabel>It can also perform additional alignment of different image channels if they were acquired with multiple microscope cameras.</CLabel>
             </CFormGroup>
@@ -288,59 +288,60 @@ const PreprocessingSettingsForm = (props) => {
                 </CFormGroup>
               </CCol>
             </CFormGroup>
-            <CFormGroup>
-              <CCardText>
-                Select which channels belong to which camera, and which ones to use for alignment.
-              </CCardText>
-              <CDataTable
-                items={props.props.get(selectPresetValue).channels}
-                fields={cameraFields}
-                itemsPerPage={100}
-                hover
-                scopedSlots = {{
-                  'Reference channel':
-                    (item)=>(
-                      <td>
-                        <CBadge color={getDICBadge(item.DIC)}>
-                          {item.DIC}
-                        </CBadge>
-                      </td>
-                    ),
-                  'Camera':
-                    (item)=>(
-                      <td>
-                        <CBadge color={getCameraBadge(item.Camera)}>
-                          {item.Camera}
-                        </CBadge>
-                      </td>
-                    ),
-                    'Delete':
-                    (item)=>(
-                      <td>
-                        <CBadge color={getDeleteBadge(item.Delete)}>
-                          {item.Delete}
-                        </CBadge>
-                      </td>
-                    ),
-                    'toggle':
-                      (item, index)=>{
-                        return (
-                          <CButtonGroup>
-                            <CButton onClick={()=>{toggleCameraStatus(index)}} color="dark" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="sync"/>   Change Camera
-                            </CButton>
-                            <CButton onClick={()=>{toggleDICStatus(index)}} color="dark" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="sync"/>   Toggle DIC
-                            </CButton>
-                            <CButton onClick={()=>{toggleDeleteStatus(index)}} color="danger" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="ban"/>   Toggle Delete
-                            </CButton>
-                          </CButtonGroup>
-                      )
+            <CCollapse show={alignCollapse}>
+              <CFormGroup>
+                <CCardText>
+                  Select which channels belong to which camera, and which ones to use for alignment.
+                </CCardText>
+                <CDataTable
+                  items={props.props.get(selectPresetValue).channels}
+                  fields={cameraFields}
+                  itemsPerPage={100}
+                  hover
+                  scopedSlots = {{
+                    'Reference channel':
+                      (item)=>(
+                        <td>
+                          <CBadge color={getDICBadge(item.DIC)}>
+                            {item.DIC}
+                          </CBadge>
+                        </td>
+                      ),
+                    'Camera':
+                      (item)=>(
+                        <td>
+                          <CBadge color={getCameraBadge(item.Camera)}>
+                            {item.Camera}
+                          </CBadge>
+                        </td>
+                      ),
+                      'Delete':
+                      (item)=>(
+                        <td>
+                          <CBadge color={getDeleteBadge(item.Delete)}>
+                            {item.Delete}
+                          </CBadge>
+                        </td>
+                      ),
+                      'toggle':
+                        (item, index)=>{
+                          return (
+                            <CButtonGroup>
+                              <CButton onClick={()=>{toggleCameraStatus(index)}} color="dark" size="sm" variant="outline">
+                                <FontAwesomeIcon icon="sync"/>   Change Camera
+                              </CButton>
+                              <CButton onClick={()=>{toggleDICStatus(index)}} color="dark" size="sm" variant="outline">
+                                <FontAwesomeIcon icon="sync"/>   Toggle DIC
+                              </CButton>
+                              <CButton onClick={()=>{toggleDeleteStatus(index)}} color="danger" size="sm" variant="outline">
+                                <FontAwesomeIcon icon="ban"/>   Toggle Delete
+                              </CButton>
+                            </CButtonGroup>
+                        )
+                      }
                     }
                   }
-                }
-              />
+                />
               <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
                 <FontAwesomeIcon icon="plus"/>   Add Channel
               </CButton>
@@ -348,7 +349,8 @@ const PreprocessingSettingsForm = (props) => {
                 <FontAwesomeIcon icon="ban"/>   Remove Channel
               </CButton>
             </CFormGroup>
-            <CCollapse show={collapse}>
+            </CCollapse>
+            <CCollapse show={tifCollapse}>
               <CFormGroup>
                 <CLabel>Select the order of dimensions within the tiff stack.</CLabel>
               </CFormGroup>
@@ -385,6 +387,19 @@ const PreprocessingSettingsForm = (props) => {
                     }
                   }}
                 />
+              </CFormGroup>
+            </CCollapse>
+            <CCollapse show={osmanBuild}>
+              <CFormGroup><CLabel></CLabel></CFormGroup>
+              <CFormGroup row>
+                <CCol md="3">
+                    <CLabel>Split videos into single frames?</CLabel>
+                </CCol>
+                <CCol md="9">
+                  <CFormGroup>
+                    <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
+                  </CFormGroup>
+                </CCol>
               </CFormGroup>
             </CCollapse>
           </CForm>

@@ -36,6 +36,7 @@ import { v4 as uuidv4 } from 'uuid';
 const ExportSettingsForm = (props) => {
   const [selectPresetValue, setselectPresetValue] = React.useState("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f")
   const [modalAdd, setModalAdd] = React.useState(false)
+  const [boxCollapse, setBoxCollapse] = React.useState(props.props.get(selectPresetValue).boxExpansion);
   const [cropCollapse, setCropCollapse] = React.useState(props.props.get(selectPresetValue).crop)
   const [videoCollapse, setVideoCollapse] = React.useState(props.props.get(selectPresetValue).video)
   const [tmpVideoSplit, setTmpVideoSplit] = React.useState(props.props.get(selectPresetValue).videoSplit)
@@ -90,9 +91,18 @@ const ExportSettingsForm = (props) => {
     }
   }
 
+  const switchMeasure = () => {
+    props.props.get(selectPresetValue).measure = !props.props.get(selectPresetValue).measure
+  }
+
   const switchCrop = () => {
     props.props.get(selectPresetValue).crop = !props.props.get(selectPresetValue).crop
     setCropCollapse(props.props.get(selectPresetValue).crop)
+  }
+
+  const switchBox = () => {
+    props.props.get(selectPresetValue).boxExpansion = !props.props.get(selectPresetValue).boxExpansion
+    setBoxCollapse(props.props.get(selectPresetValue).boxExpansion)
   }
 
   const switchVideo = () => {
@@ -111,6 +121,10 @@ const ExportSettingsForm = (props) => {
 
   const switchVideoSplit = () => {
     props.props.get(selectPresetValue).videoSplit = !props.props.get(selectPresetValue).videoSplit
+  }
+
+  const setboxsize = (value) => {
+    props.props.get(selectPresetValue).boxsize = value
   }
 
   const setScoreThreshold =(value) => {
@@ -161,10 +175,15 @@ const ExportSettingsForm = (props) => {
     const id = uuidv4()
     props.props.set(id, {
       name: NameInput,
+      measure: props.props.get(selectPresetValue).measure,
       crop: props.props.get(selectPresetValue).crop,
       classes: props.props.get(selectPresetValue).classes,
+      video: props.props.get(selectPresetValue).video,
       videoSplit: props.props.get(selectPresetValue).videoSplit,
-      scoreThreshold: props.props.get(selectPresetValue).scoreThreshold
+      scoreThreshold: props.props.get(selectPresetValue).scoreThreshold,
+      boxsize: props.props.get(selectPresetValue).boxsize,
+      boxExpansion: props.props.get(selectPresetValue).boxExpansion
+
     })
 
     setselectPresetValue(id)
@@ -203,6 +222,36 @@ const ExportSettingsForm = (props) => {
               </CSelect>
             </CFormGroup>
             <CFormGroup><CLabel></CLabel></CFormGroup>
+            <CFormGroup row>
+              <CCol md="9">
+                  <CLabel>Expand detected bounding boxes to set static size?</CLabel>
+              </CCol>
+              <CCol md="3">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchBox} checked={props.props.get(selectPresetValue).boxExpansion} id="boxYes"/>
+                </CFormGroup>
+              </CCol>
+            </CFormGroup>
+            <CCollapse show={boxCollapse}> 
+              <CFormGroup row>
+                <CCol md="7">
+                  <CLabel>Size of cropped boxes around detected objects.</CLabel>
+                </CCol>
+                <CCol md="3">
+                  <CInput type='number' min={10} step={5} defaultValue={props.props.get(selectPresetValue).boxsize} onChange={(event) => setboxsize(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+            </CCollapse>
+            <CFormGroup row>
+              <CCol md="9">
+                  <CLabel>Measure differences between mother cells? (Warning: Dev setting)</CLabel>
+              </CCol>
+              <CCol md="3">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchMeasure} checked={props.props.get(selectPresetValue).measure} id="measureYes"/>
+                </CFormGroup>
+              </CCol>
+            </CFormGroup>
             <CFormGroup row>
               <CCol md="9">
                   <CLabel>Save crops of detected objects?</CLabel>
@@ -260,10 +309,10 @@ const ExportSettingsForm = (props) => {
                   }
                 />
                 <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
-                  <FontAwesomeIcon icon="plus"/>   Add Channel
+                  <FontAwesomeIcon icon="plus"/>   Add Class
                 </CButton>
                 <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm">
-                  <FontAwesomeIcon icon="ban"/>   Remove Channel
+                  <FontAwesomeIcon icon="ban"/>   Remove last class
                 </CButton>
               </CFormGroup>
               <CFormGroup><CLabel></CLabel></CFormGroup>
@@ -295,7 +344,7 @@ const ExportSettingsForm = (props) => {
                   <CLabel>Set threshold of detection score for exporting objects (between 0 and 1)</CLabel>
                 </CCol>
                 <CCol md="3">
-                  <CInput type='number' min={0} max={1} step={0.05} defaultValue={props.props.get(selectPresetValue).scoreThreshold} onChange={(event) => setScoreThreshold(event)}/>
+                  <CInput type='number' min={0} max={1} step={0.05} defaultValue={props.props.get(selectPresetValue).scoreThreshold} onChange={(event) => setScoreThreshold(event.currentTarget.value)}/>
                 </CCol>
               </CFormGroup>
           </CForm>

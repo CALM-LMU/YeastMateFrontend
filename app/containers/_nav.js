@@ -11,12 +11,12 @@ export default [
     to: '/job',
     icon: 'cil-speedometer',
   },
-  {
-    _tag: 'CSidebarNavItem',
-    name: 'Correct detections',
-    to: '/correct',
-    icon: 'cil-speedometer',
-  },
+  // {
+  //   _tag: 'CSidebarNavItem',
+  //   name: 'Correct detections',
+  //   to: '/correct',
+  //   icon: 'cil-speedometer',
+  // },
   {
     _tag: 'CSidebarNavTitle',
     _children: ['Settings']

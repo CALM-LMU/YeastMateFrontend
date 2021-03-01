@@ -27,7 +27,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const NewJob = (props) => {
   const [toasts, setToasts] = React.useState([{}])
-  const [pathInput, setPathInput] = React.useState("")
 
   const handleAddPathClick = () => {
     var selectedPath = dialog.showOpenDialog({
@@ -54,6 +53,18 @@ const NewJob = (props) => {
     ])
   }
 
+  const setPathInput = (value) => {
+    props.props.selection.set('path', value)
+  }
+
+  const setIncludeTagInput = (value) => {
+    props.props.selection.set('includeTag', value)
+  }
+
+  const setExcludeTagInput = (value) => {
+    props.props.selection.set('excludeTag', value)
+  }
+
   const handlePreprocessingSelection = (value) => {
     props.props.selection.set('preprocessing', value)
   }
@@ -71,7 +82,9 @@ const NewJob = (props) => {
       'http://127.0.0.1:5005/',
       {
         _id: uuidv4(),
-        path: path.normalize(pathInput),
+        path: path.normalize(props.props.selection.get('path')),
+        includeTag: props.props.selection.get('includeTag'),
+        excludeTag: props.props.selection.get('excludeTag'),
         preprocessing: props.props.preprocessing.get(props.props.selection.get('preprocessing')),
         detection: props.props.detection.get(props.props.selection.get('detection')),
         export: props.props.export.get(props.props.selection.get('export')),
@@ -95,9 +108,17 @@ const NewJob = (props) => {
             <CFormGroup>
               <CLabel>Path:</CLabel>
               <CInputGroupAppend>
-                <CInput id="pathInput" onChange={(event) => setPathInput(event.currentTarget.value)} value={pathInput}></CInput>
+                <CInput id="pathInput" onChange={(event) => setPathInput(event.currentTarget.value)} value={props.props.selection.get('path')}></CInput>
                 <CButton onClick={handleAddPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
               </CInputGroupAppend>
+            </CFormGroup>
+            <CFormGroup>
+              <CLabel>Include only files with following tag:</CLabel>
+              <CInput id="includeTagInput" onChange={(event) => setIncludeTagInput(event.currentTarget.value)} value={props.props.selection.get('includeTag')}></CInput>
+            </CFormGroup>
+            <CFormGroup>
+              <CLabel>Exclude files with following tag:</CLabel>
+              <CInput id="excludeTagInput" onChange={(event) => setExcludeTagInput(event.currentTarget.value)} value={props.props.selection.get('excludeTag')}></CInput>
             </CFormGroup>
             <CFormGroup>
               <CLabel>Select your preprocessing preset if you want to align or load nd2 files.</CLabel>

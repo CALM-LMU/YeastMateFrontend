@@ -22,8 +22,9 @@ sidebarShow.set('show', 'responsive')
 
 preprocessingPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
   name: "Default",
-  alignment: true,
+  alignment: false,
   inputFileFormat: '.nd2',
+  videoSplit: false,
   channels: [
     {"Camera":1,"Channel":1,"DIC":"True","Delete":"Keep"},
     {"Camera":2,"Channel":2,"DIC":"True","Delete":"Delete"},
@@ -43,23 +44,27 @@ preprocessingPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
 detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     name: "Default",
     graychannel: 0,
-    boxsize: 200,
     zstack: false,
     video: false,
-    boxExpansion: true,
+    scaleFactor: 1.0,
     frameSelection: "all",
-    ip: "10.153.168.3:5000",
+    //ip: "10.153.168.3:5000",
+    ip: "127.0.0.1:5000"
  })
 
 exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
   name: "Default",
-  crop: true,
+  measure: true,
+  crop: false,
   classes: [
     {"Class ID":1,"Tag":"single_cell","Crop":"False", "Mask": "False"},
     {"Class ID":2,"Tag":"mating","Crop":"True", "Mask": "True"},
   ],
+  video: false,
   videoSplit: false,
-  scoreThreshold: 0.5
+  scoreThreshold: 0.5,
+  boxExpansion: false,
+  boxsize: 200
 })
 
 if (typeof store.get('preprocessing') !== 'undefined') {
@@ -92,6 +97,9 @@ if (typeof store.get('selection') !== 'undefined') {
   }
 }
 else {
+  presetSelection.set('path', "")
+  presetSelection.set('includeTag', "")
+  presetSelection.set('excludeTag', "")
   presetSelection.set('preprocessing', null)
   presetSelection.set('detection', "a809ff23-4235-484f-86f2-e5d87da8333d")
   presetSelection.set('export', null)

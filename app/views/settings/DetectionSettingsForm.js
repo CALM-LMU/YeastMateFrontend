@@ -35,7 +35,6 @@ import { v4 as uuidv4 } from 'uuid';
 const DetectionSettingsForm = (props) => {
   const [selectPresetValue, setselectPresetValue] = React.useState("a809ff23-4235-484f-86f2-e5d87da8333d")
   const [modalAdd, setModalAdd] = React.useState(false)
-  const [boxCollapse, setBoxCollapse] = React.useState(props.props.get(selectPresetValue).boxExpansion);
   const [videoCollapse, setVideoCollapse] = React.useState(props.props.get(selectPresetValue).video);
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
@@ -68,17 +67,12 @@ const DetectionSettingsForm = (props) => {
     setVideoCollapse(props.props.get(selectPresetValue).video)
   }
 
-  const switchBox = () => {
-    props.props.get(selectPresetValue).boxExpansion = !props.props.get(selectPresetValue).boxExpansion
-    setBoxCollapse(props.props.get(selectPresetValue).boxExpansion)
-  }
-
   const setgraychannel = (value) => {
     props.props.get(selectPresetValue).graychannel = value
   }
 
-  const setboxsize = (value) => {
-    props.props.get(selectPresetValue).boxsize = value
+  const setscalefactor = (value) => {
+    props.props.get(selectPresetValue).scaleFactor = value
   }
 
   const setIP = (value) => {
@@ -100,10 +94,8 @@ const DetectionSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       graychannel: props.props.get(selectPresetValue).graychannel,
-      boxsize: props.props.get(selectPresetValue).boxsize,
       zstack: props.props.get(selectPresetValue).zstack,
       video: props.props.get(selectPresetValue).video,
-      boxExpansion: props.props.get(selectPresetValue).boxExpansion, 
       frameSelection: props.props.get(selectPresetValue).frameSelection,
       ip: props.props.get(selectPresetValue).ip
     })
@@ -160,7 +152,15 @@ const DetectionSettingsForm = (props) => {
                 <CLabel>Axis of non-fluorescent (BF/DIC/PH) overview channel.</CLabel>
               </CCol>
               <CCol sm="2">
-                <CInput type='number' min={0} defaultValue={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event)}/>
+                <CInput type='number' min={0} defaultValue={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event.currentTarget.value)}/>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="8">
+                <CLabel>Scale factor of input image.</CLabel>
+              </CCol>
+              <CCol sm="2">
+                <CInput type='number' min={0} max={10} step={0.1} defaultValue={props.props.get(selectPresetValue).scaleFactor} onChange={(event) => setscalefactor(event.currentTarget.value)}/>
               </CCol>
             </CFormGroup>
             <CFormGroup row>
@@ -196,26 +196,6 @@ const DetectionSettingsForm = (props) => {
                       <option value={"last"} name='Use last frame as reference.'>Use last frame as reference</option>
                     </CSelect>
                   </CFormGroup>
-                </CCol>
-              </CFormGroup>
-            </CCollapse>
-            <CFormGroup row>
-              <CCol md="9">
-                  <CLabel>Expand detected bounding boxes to set static size?</CLabel>
-              </CCol>
-              <CCol md="3">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchBox} checked={props.props.get(selectPresetValue).boxExpansion} id="boxYes"/>
-                </CFormGroup>
-              </CCol>
-            </CFormGroup>
-            <CCollapse show={boxCollapse}> 
-              <CFormGroup row>
-                <CCol md="7">
-                  <CLabel>Size of cropped boxes around detected objects.</CLabel>
-                </CCol>
-                <CCol md="3">
-                  <CInput type='number' min={10} step={5} defaultValue={props.props.get(selectPresetValue).boxsize} onChange={(event) => setboxsize(event)}/>
                 </CCol>
               </CFormGroup>
             </CCollapse>

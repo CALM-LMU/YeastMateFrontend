@@ -80,7 +80,7 @@ app.on('ready', async () => {
   // }
   // if (os.platform() === 'win32') {
   shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateIO/YeastMateIO.exe`));
-  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateDetector/YeastMateDetector.exe`));
+ // shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateDetector/YeastMateDetector.exe`));
   // }
 
   mainWindow = new BrowserWindow({

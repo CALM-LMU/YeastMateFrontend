@@ -58,7 +58,9 @@ exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
   crop: false,
   classes: [
     {"Class ID":1,"Tag":"single_cell","Crop":"False", "Mask": "False"},
-    {"Class ID":2,"Tag":"mating","Crop":"True", "Mask": "True"},
+    {"Class ID":2,"Tag":"mother","Crop":"False", "Mask": "False"},
+    {"Class ID":3,"Tag":"daughter","Crop":"False", "Mask": "False"},
+    {"Class ID":4,"Tag":"mating","Crop":"True", "Mask": "True"},
   ],
   video: false,
   videoSplit: false,

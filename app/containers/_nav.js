@@ -11,12 +11,18 @@ export default [
     to: '/job',
     icon: 'cil-speedometer',
   },
-  // {
-  //   _tag: 'CSidebarNavItem',
-  //   name: 'Correct detections',
-  //   to: '/correct',
-  //   icon: 'cil-speedometer',
-  // },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Annotate your images',
+    to: '/annotate',
+    icon: 'cil-speedometer',
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Retrain the model',
+    to: '/train',
+    icon: 'cil-speedometer',
+  },
   {
     _tag: 'CSidebarNavTitle',
     _children: ['Settings']

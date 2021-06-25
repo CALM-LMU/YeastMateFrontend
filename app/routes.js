@@ -8,12 +8,14 @@ const DetectionSettings = React.lazy(() => import('./views/settings/DetectionSet
 const ExportSettings = React.lazy(() => import('./views/settings/ExportSettingsForm'));
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'));
 const StartNewJob = React.lazy(() => import('./views/newjob/NewJob'));
-const CorrectDetections = React.lazy(() => import('./views/correction/Correction'));
+const Annotate = React.lazy(() => import('./views/annotate/Annotate'));
+const Train = React.lazy(() => import('./views/train/Train'));
 
 const store = new Store();
 
 var sidebarShow = observable(new Map())
 var presetSelection = observable(new Map())
+var annotationPath = observable(new Map())
 var preprocessingPresetList = observable(new Map())
 var detectPresetList = observable(new Map())
 var exportPresetList = observable(new Map())
@@ -107,16 +109,26 @@ else {
   presetSelection.set('export', null)
 }
 
+if (typeof store.get('annotationPath') !== 'undefined') {
+  for (let [key, value] of Object.entries(store.get('selection'))) {
+    annotationPath.set(key, value)
+  }
+}
+else {
+  annotationPath.set('path', "")
+}
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
-  { path: '/correct', name: 'Correct detections', component: CorrectDetections },
+  { path: '/annotate', name: 'Annotate your data', component: Annotate, data: annotationPath },
+  { path: '/train', name: 'Retrain the model', component: Train },
   { path: '/preprocessing', name: 'Preprocessing Settings', component: PreprocessingSettings, data: preprocessingPresetList },
   { path: '/detection', name: 'Detection Settings', component: DetectionSettings, data: detectPresetList },
   { path: '/export', name: 'Export Settings', component: ExportSettings, data: exportPresetList },
 ];
 
-const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
+const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { selection: presetSelection, annotationPath: annotationPath, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
 
 export default prop;

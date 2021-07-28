@@ -3,6 +3,7 @@ import React from 'react'
 import { observer } from "mobx-react-lite"
 const path = require('path');
 const { dialog } = require('electron').remote;
+const { ipcRenderer } = require('electron')
 
 import {
   CButton,
@@ -39,10 +40,8 @@ const Annotate = (props) => {
   }
 
   const submitJob = () => {
-    
+    ipcRenderer.send('start-napari')
   };
-
-  console.log(props)
 
   return (
     <>
@@ -61,6 +60,9 @@ const Annotate = (props) => {
             </CFormGroup>
           </CForm>
         </CCardBody>
+        <CCardFooter>
+          <CButton type="add" onClick={submitJob} size="sm" color="success"><FontAwesomeIcon icon="plus" /> Start annotation process.</CButton>
+        </CCardFooter>
       </CCard>
     </>
   )

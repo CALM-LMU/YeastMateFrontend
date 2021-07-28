@@ -9,7 +9,6 @@ const ExportSettings = React.lazy(() => import('./views/settings/ExportSettingsF
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'));
 const StartNewJob = React.lazy(() => import('./views/newjob/NewJob'));
 const Annotate = React.lazy(() => import('./views/annotate/Annotate'));
-const Train = React.lazy(() => import('./views/train/Train'));
 
 const store = new Store();
 
@@ -123,7 +122,6 @@ const routes = [
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
   { path: '/annotate', name: 'Annotate your data', component: Annotate, data: annotationPath },
-  { path: '/train', name: 'Retrain the model', component: Train },
   { path: '/preprocessing', name: 'Preprocessing Settings', component: PreprocessingSettings, data: preprocessingPresetList },
   { path: '/detection', name: 'Detection Settings', component: DetectionSettings, data: detectPresetList },
   { path: '/export', name: 'Export Settings', component: ExportSettings, data: exportPresetList },

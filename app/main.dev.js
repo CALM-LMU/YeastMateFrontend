@@ -67,6 +67,10 @@ ipcMain.on('open-file-dialog-for-file', function (event) {
      });
  }});
 
+ipcMain.on('start-napari', (event) => {
+  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/Napari/Napari.exe`));
+})
+
 app.on('ready', async () => {
   if (
     process.env.NODE_ENV === 'development' ||
@@ -75,13 +79,15 @@ app.on('ready', async () => {
     await installExtensions();
   }
 
-  // if (os.platform() === 'linux') {
-  //shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
-  // }
-  // if (os.platform() === 'win32') {
-  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateIO/YeastMateIO.exe`));
- // shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateDetector/YeastMateDetector.exe`));
-  // }
+  if (os.platform() === 'linux') {
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
+  }
+  if (os.platform() === 'darwin') {
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateIO/YeastMateIO`));
+  }
+  if (os.platform() === 'win32') {
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateIO/YeastMateIO.exe`));
+  }
 
   mainWindow = new BrowserWindow({
     show: false,

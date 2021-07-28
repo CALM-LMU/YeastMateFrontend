@@ -18,12 +18,6 @@ export default [
     icon: 'cil-speedometer',
   },
   {
-    _tag: 'CSidebarNavItem',
-    name: 'Retrain the model',
-    to: '/train',
-    icon: 'cil-speedometer',
-  },
-  {
     _tag: 'CSidebarNavTitle',
     _children: ['Settings']
   },

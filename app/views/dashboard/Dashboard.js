@@ -31,10 +31,14 @@ const Dashboard = () => {
   const [jobList, setjobList] = React.useState([])
 
   const get_jobs = async () => {
-    const result = await axios(
-      'http://127.0.0.1:5005/',
-    );
-    setjobList(result.data.tasks);
+    try {
+      const result = await axios(
+        'http://127.0.0.1:5005/',
+      );
+      setjobList(result.data.tasks);
+    } catch (error) {
+      setjobList([]);
+    }
   };
 
   React.useEffect(() => { 

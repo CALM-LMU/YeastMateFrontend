@@ -49,13 +49,11 @@ detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     video: false,
     scaleFactor: 1.0,
     frameSelection: "all",
-    //ip: "10.153.168.3:5000",
     ip: "127.0.0.1:5000"
  })
 
 exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
   name: "Default",
-  measure: true,
   crop: false,
   classes: [
     {"Class ID":1,"Tag":"single_cell","Crop":"False", "Mask": "False"},

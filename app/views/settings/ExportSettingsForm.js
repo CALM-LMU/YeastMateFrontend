@@ -91,10 +91,6 @@ const ExportSettingsForm = (props) => {
     }
   }
 
-  const switchMeasure = () => {
-    props.props.get(selectPresetValue).measure = !props.props.get(selectPresetValue).measure
-  }
-
   const switchCrop = () => {
     props.props.get(selectPresetValue).crop = !props.props.get(selectPresetValue).crop
     setCropCollapse(props.props.get(selectPresetValue).crop)
@@ -175,7 +171,6 @@ const ExportSettingsForm = (props) => {
     const id = uuidv4()
     props.props.set(id, {
       name: NameInput,
-      measure: props.props.get(selectPresetValue).measure,
       crop: props.props.get(selectPresetValue).crop,
       classes: props.props.get(selectPresetValue).classes,
       video: props.props.get(selectPresetValue).video,
@@ -242,16 +237,6 @@ const ExportSettingsForm = (props) => {
                 </CCol>
               </CFormGroup>
             </CCollapse>
-            <CFormGroup row>
-              <CCol md="9">
-                  <CLabel>Measure differences between mother cells? (Warning: Dev setting)</CLabel>
-              </CCol>
-              <CCol md="3">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchMeasure} checked={props.props.get(selectPresetValue).measure} id="measureYes"/>
-                </CFormGroup>
-              </CCol>
-            </CFormGroup>
             <CFormGroup row>
               <CCol md="9">
                   <CLabel>Save crops of detected objects?</CLabel>

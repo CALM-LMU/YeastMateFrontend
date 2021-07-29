@@ -83,10 +83,10 @@ app.on('ready', async () => {
     shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
   }
   if (os.platform() === 'darwin') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateIO/YeastMateIO`));
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`));
   }
   if (os.platform() === 'win32') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateIO/YeastMateIO.exe`));
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`));
   }
 
   mainWindow = new BrowserWindow({

@@ -71,8 +71,8 @@ const DetectionSettingsForm = (props) => {
     props.props.get(selectPresetValue).graychannel = value
   }
 
-  const setscalefactor = (value) => {
-    props.props.get(selectPresetValue).scaleFactor = value
+  const setpixelsize = (value) => {
+    props.props.get(selectPresetValue).pixelSize = value
   }
 
   const setIP = (value) => {
@@ -94,6 +94,7 @@ const DetectionSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       graychannel: props.props.get(selectPresetValue).graychannel,
+      pixelsize: props.props.get(selectPresetValue).pixelSize,
       zstack: props.props.get(selectPresetValue).zstack,
       video: props.props.get(selectPresetValue).video,
       frameSelection: props.props.get(selectPresetValue).frameSelection,
@@ -157,10 +158,18 @@ const DetectionSettingsForm = (props) => {
             </CFormGroup>
             <CFormGroup row>
               <CCol md="8">
-                <CLabel>Scale factor of input image.</CLabel>
+                <CLabel>Set pixel size of image in nm.</CLabel>
               </CCol>
               <CCol sm="2">
-                <CInput type='number' min={0} max={10} step={0.1} defaultValue={props.props.get(selectPresetValue).scaleFactor} onChange={(event) => setscalefactor(event.currentTarget.value)}/>
+                <CInput type='number' min={0} max={5000} step={1} defaultValue={props.props.get(selectPresetValue).pixelSize} onChange={(event) => setpixelsize(event.currentTarget.value)}/>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="8">
+                <CLabel>Set pixel size of image in nm.</CLabel>
+              </CCol>
+              <CCol md="7">
+                <CInput type='range' id="yearRange" name="yearRange" min={1990} max={2021} />
               </CCol>
             </CFormGroup>
             <CFormGroup row>

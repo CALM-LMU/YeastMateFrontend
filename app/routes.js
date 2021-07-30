@@ -47,7 +47,7 @@ detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     graychannel: 0,
     zstack: false,
     video: false,
-    scaleFactor: 1.0,
+    pixelSize: 110,
     frameSelection: "all",
     ip: "127.0.0.1:5000"
  })

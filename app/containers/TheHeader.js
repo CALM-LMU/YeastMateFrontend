@@ -33,7 +33,7 @@ const TheHeader = (props) => {
 
   const closeWin = () => {
     props.props.store.set('selection', toJS(props.props.lists.selection))
-    props.props.store.set('annotationPath', toJS(props.props.lists.annotationPath))
+    props.props.store.set('annotation', toJS(props.props.lists.annotation))
     props.props.store.set('preprocessing', toJS(props.props.lists.preprocessing))
     props.props.store.set('detection', toJS(props.props.lists.detection))
     props.props.store.set('export', toJS(props.props.lists.export))

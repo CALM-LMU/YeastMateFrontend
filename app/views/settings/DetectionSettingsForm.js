@@ -13,7 +13,6 @@ import {
   CFormGroup,
   CInput,
   CInputGroupPrepend,
-  CInputGroupAppend,
   CLabel,
   CModal,
   CModalFooter,
@@ -79,6 +78,14 @@ const DetectionSettingsForm = (props) => {
     props.props.get(selectPresetValue).ip = value
   }
 
+  const setlowerquantile = (value) => {
+    props.props.get(selectPresetValue).lowerQuantile = value
+  }
+
+  const setupperquantile = (value) => {
+    props.props.get(selectPresetValue).upperQuantile = value
+  }
+
   const handleLocalIPClick = () => {
     setIP("127.0.0.1:5000")
   }
@@ -94,7 +101,9 @@ const DetectionSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       graychannel: props.props.get(selectPresetValue).graychannel,
-      pixelsize: props.props.get(selectPresetValue).pixelSize,
+      pixelSize: props.props.get(selectPresetValue).pixelSize,
+      lowerQuantile: props.props.get(selectPresetValue).lowerQuantile,
+      upperQuantile: props.props.get(selectPresetValue).upperQuantile,
       zstack: props.props.get(selectPresetValue).zstack,
       video: props.props.get(selectPresetValue).video,
       frameSelection: props.props.get(selectPresetValue).frameSelection,
@@ -166,14 +175,22 @@ const DetectionSettingsForm = (props) => {
             </CFormGroup>
             <CFormGroup row>
               <CCol md="8">
-                <CLabel>Set pixel size of image in nm.</CLabel>
+                <CLabel>Set lower quantile for normalization.</CLabel>
               </CCol>
-              <CCol md="7">
-                <CInput type='range' id="yearRange" name="yearRange" min={1990} max={2021} />
+              <CCol md="2">
+                <CInput type='number' min={0} max={50} step={0.5} defaultValue={props.props.get(selectPresetValue).lowerQuantile} onChange={(event) => setlowerquantile(event.currentTarget.value)}/>
               </CCol>
             </CFormGroup>
             <CFormGroup row>
-              <CCol md="9">
+              <CCol md="8">
+                <CLabel>Set upper quantile for normalization.</CLabel>
+              </CCol>
+              <CCol md="2">
+                <CInput type='number' min={50} max={100} step={0.5} defaultValue={props.props.get(selectPresetValue).upperQuantile} onChange={(event) => setupperquantile(event.currentTarget.value)}/>
+              </CCol>
+            </CFormGroup>
+            <CFormGroup row>
+              <CCol md="8">
                   <CLabel>Is the image a z-stack?</CLabel>
               </CCol>
               <CCol md="3">
@@ -183,7 +200,7 @@ const DetectionSettingsForm = (props) => {
               </CCol>
             </CFormGroup>
             <CFormGroup row>
-              <CCol md="9">
+              <CCol md="8">
                   <CLabel>Is the image a time-series?</CLabel>
               </CCol>
               <CCol md="3">

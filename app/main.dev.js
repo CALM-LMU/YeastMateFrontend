@@ -15,6 +15,7 @@ const os = require('os');
 const upath = require('upath');
 
 const {shell} = require('electron');
+const spawn = require("child_process").spawn;
 
 let mainWindow = null;
 
@@ -53,22 +54,20 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('open-file-dialog-for-file', function (event) {
-  if(os.platform() === 'linux' || os.platform() === 'win32'){
      dialog.showOpenDialog({
          properties: ['openDirectory']
      }, function (files) {
         if (files) event.sender.send('selected-file', files[0]);
      });
- } else {
-     dialog.showOpenDialog({
-         properties: ['openDirectory']
-     }, function (files) {
-         if (files) event.sender.send('selected-file', files[0]);
-     });
- }});
+ });
 
-ipcMain.on('start-napari', (event) => {
-  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/Napari/Napari.exe`));
+ipcMain.on('start-napari', (event, path, scoreThresholds) => {
+    let bat = spawn("cmd.exe", [
+      "/c",          // Argument for cmd.exe to carry out the specified script
+      upath.toUnix(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation.exe`)), // Path to your file
+      path,
+      scoreThresholds
+  ]);
 })
 
 app.on('ready', async () => {

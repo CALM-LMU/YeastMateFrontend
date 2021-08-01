@@ -14,12 +14,20 @@ const store = new Store();
 
 var sidebarShow = observable(new Map())
 var presetSelection = observable(new Map())
-var annotationPath = observable(new Map())
+var annotationPresetList= observable(new Map())
 var preprocessingPresetList = observable(new Map())
 var detectPresetList = observable(new Map())
 var exportPresetList = observable(new Map())
 
 sidebarShow.set('show', 'responsive')
+
+annotationPresetList.set("821198b7-83e5-4ccb-9579-48f5f7849221", {
+  name: "Default",
+  path: "",
+  differentThresholds: true,
+  matingThreshold: 50,
+  buddingThreshold: 50
+})
 
 preprocessingPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
   name: "Default",
@@ -48,6 +56,8 @@ detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     zstack: false,
     video: false,
     pixelSize: 110,
+    lowerQuantile: 1,
+    upperQuantile:99,
     frameSelection: "all",
     ip: "127.0.0.1:5000"
  })
@@ -67,6 +77,14 @@ exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
   boxExpansion: false,
   boxsize: 200
 })
+
+if (typeof store.get('annotation') !== 'undefined') {
+  for (let [key, value] of Object.entries(store.get('annotation'))) {
+    if (key !== "821198b7-83e5-4ccb-9579-48f5f7849221") {
+      preprocessingPresetList.set(key, value)
+    }
+  }
+}
 
 if (typeof store.get('preprocessing') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('preprocessing'))) {
@@ -106,25 +124,16 @@ else {
   presetSelection.set('export', null)
 }
 
-if (typeof store.get('annotationPath') !== 'undefined') {
-  for (let [key, value] of Object.entries(store.get('selection'))) {
-    annotationPath.set(key, value)
-  }
-}
-else {
-  annotationPath.set('path', "")
-}
-
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
-  { path: '/annotate', name: 'Annotate your data', component: Annotate, data: annotationPath },
+  { path: '/annotate', name: 'Annotate your data', component: Annotate, data: annotationPresetList },
   { path: '/preprocessing', name: 'Preprocessing Settings', component: PreprocessingSettings, data: preprocessingPresetList },
   { path: '/detection', name: 'Detection Settings', component: DetectionSettings, data: detectPresetList },
   { path: '/export', name: 'Export Settings', component: ExportSettings, data: exportPresetList },
 ];
 
-const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { selection: presetSelection, annotationPath: annotationPath, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
+const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { selection: presetSelection, annotation: annotationPresetList, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
 
 export default prop;

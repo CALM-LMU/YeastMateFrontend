@@ -165,12 +165,12 @@ const Annotate = (props) => {
               </CInputGroupAppend>
             </CFormGroup>
             <CFormGroup>
-              <CCol md="3">
+              <CCol md="8">
                 <CLabel></CLabel>
                 <CLabel>Do you already have results from detection and want to apply a score threshold?</CLabel>
                 <CLabel>A score threshold of 50% as a baseline is highly recommended.</CLabel>
               </CCol>
-              <CCol md="9">
+              <CCol md="2">
                 <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchThresholds} checked={props.props.get(selectPresetValue).differentThresholds} id="differentThresholds" />
               </CCol>
             </CFormGroup>

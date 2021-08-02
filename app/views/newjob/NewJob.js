@@ -78,8 +78,9 @@ const NewJob = (props) => {
   }
 
   const submitJob = () => {
+    console.log('http://127.0.0.1:'+props.props.selection.get('port'))
     axios.post(
-      'http://127.0.0.1:5005/',
+      'http://127.0.0.1:'+props.props.selection.get('port'),
       {
         _id: uuidv4(),
         path: path.normalize(props.props.selection.get('path')),

@@ -90,7 +90,9 @@
       ]
     },
     "win": {
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     },
     "nsis": {
       "differentialPackage": false,
@@ -98,7 +100,11 @@
       "oneClick": true
     },
     "linux": {
-      "target": ["deb", "rpm", "AppImage"],
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
       "category": "Development"
     },
     "directories": {
@@ -143,12 +149,21 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/internals/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },
-    "moduleFileExtensions": ["js", "jsx", "json"],
-    "moduleDirectories": ["node_modules", "app/node_modules"],
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "app/node_modules"
+    ],
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     },
-    "setupFiles": ["./internals/scripts/CheckBuildsExist.js"]
+    "setupFiles": [
+      "./internals/scripts/CheckBuildsExist.js"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
@@ -275,6 +290,7 @@
     "image-data-uri": "^2.0.1",
     "mobx": "^5.15.4",
     "mobx-react-lite": "^2.0.7",
+    "portscanner": "^2.2.0",
     "prop-types": "^15.7.2",
     "rc-slider": "^9.7.2",
     "react": "^16.12.0",

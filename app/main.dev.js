@@ -41,10 +41,6 @@ const installExtensions = async () => {
   ).catch(console.log);
 };
 
-/**
- * Add event listeners...
- */
-
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
@@ -62,12 +58,23 @@ ipcMain.on('open-file-dialog-for-file', function (event) {
  });
 
 ipcMain.on('start-napari', (event, path, scoreThresholds) => {
-    let bat = spawn("cmd.exe", [
-      "/c",          // Argument for cmd.exe to carry out the specified script
-      upath.toUnix(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation.exe`)), // Path to your file
+  if (os.platform() === 'linux') {
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
+  }
+  if (os.platform() === 'darwin') {
+    let bat = spawn('/Users/bunk/work/BioElectron/python/YeastMate/YeastmateAnnotation', [
       path,
       scoreThresholds
   ]);
+  }
+  if (os.platform() === 'win32') {
+    let bat = spawn("cmd.exe", [
+      "/c", 
+      upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation.exe`), 
+      path,
+      scoreThresholds
+  ]);
+  }
 })
 
 app.on('ready', async () => {
@@ -82,10 +89,14 @@ app.on('ready', async () => {
     shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
   }
   if (os.platform() === 'darwin') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`));
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`))
   }
   if (os.platform() === 'win32') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`));
+    let bat = spawn("cmd.exe", [
+      "/c",     
+      upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`),
+      ioport.toString()
+    ]);
   }
 
   mainWindow = new BrowserWindow({
@@ -105,8 +116,6 @@ app.on('ready', async () => {
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
-  // @TODO: Use 'ready-to-show' event
-  //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');

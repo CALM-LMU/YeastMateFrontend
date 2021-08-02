@@ -1,6 +1,7 @@
 import React from 'react';
 import { observable } from 'mobx';
 
+var portscanner = require('portscanner');
 const Store = require('electron-store');
 
 const PreprocessingSettings = React.lazy(() => import('./views/settings/PreprocessingSettingsForm'));
@@ -123,6 +124,10 @@ else {
   presetSelection.set('detection', "a809ff23-4235-484f-86f2-e5d87da8333d")
   presetSelection.set('export', null)
 }
+
+portscanner.findAPortNotInUse(11001, 11201, '127.0.0.1', function(error, port) {
+  presetSelection.set('port', port)
+})
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },

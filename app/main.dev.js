@@ -86,17 +86,13 @@ app.on('ready', async () => {
   }
 
   if (os.platform() === 'linux') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`));
   }
   if (os.platform() === 'darwin') {
     shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`))
   }
   if (os.platform() === 'win32') {
-    let bat = spawn("cmd.exe", [
-      "/c",     
-      upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`),
-      ioport.toString()
-    ]);
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`))
   }
 
   mainWindow = new BrowserWindow({

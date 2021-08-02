@@ -62,7 +62,7 @@ ipcMain.on('start-napari', (event, path, scoreThresholds) => {
     shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
   }
   if (os.platform() === 'darwin') {
-    let bat = spawn('/Users/bunk/work/BioElectron/python/YeastMate/YeastmateAnnotation', [
+    let bat = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastmateAnnotation`), [
       path,
       scoreThresholds
   ]);

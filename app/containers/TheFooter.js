@@ -9,7 +9,7 @@ const TheFooter = () => {
         <a href="mailto:bunk@bio.lmu.de" target="_blank" rel="noopener noreferrer">bunk@bio.lmu.de</a>
       </div>
       <div className="mfs-auto">
-        <a>Version 0.9.7</a>
+        <a>Version 0.9.8</a>
       </div>
     </CFooter>
   )

@@ -25,7 +25,7 @@ sidebarShow.set('show', 'responsive')
 annotationPresetList.set("821198b7-83e5-4ccb-9579-48f5f7849221", {
   name: "Default",
   path: "",
-  differentThresholds: true,
+  differentThresholds: false,
   matingThreshold: 50,
   buddingThreshold: 50
 })
@@ -55,10 +55,17 @@ detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     name: "Default",
     graychannel: 0,
     zstack: false,
+    zSlice: 50,
     video: false,
     pixelSize: 110,
+    referencePixelSize: 110,
+    advancedSettings: false,
+    superAdvancedSettings: false,
     lowerQuantile: 1,
     upperQuantile:99,
+    singleThreshold: 90,
+    matingThreshold: 50,
+    buddingThreshold: 50,
     frameSelection: "all",
     ip: "127.0.0.1:5000"
  })
@@ -67,16 +74,14 @@ exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
   name: "Default",
   crop: false,
   classes: [
-    {"Class ID":1,"Tag":"single_cell","Crop":"False", "Mask": "False"},
-    {"Class ID":2,"Tag":"mother","Crop":"False", "Mask": "False"},
-    {"Class ID":3,"Tag":"daughter","Crop":"False", "Mask": "False"},
-    {"Class ID":4,"Tag":"mating","Crop":"True", "Mask": "True"},
+    {"Class ID":0,"Tag":"Single cells","Crop":"False"},
+    {"Class ID":1,"Tag":"Mating zygotes","Crop":"True"},
+    {"Class ID":2,"Tag":"Budding events","Crop":"True"},
   ],
-  video: false,
-  videoSplit: false,
-  scoreThreshold: 0.5,
   boxExpansion: false,
-  boxsize: 200
+  boxSize: 200,
+  boxScaleSwitch: false,
+  boxScale: 1
 })
 
 if (typeof store.get('annotation') !== 'undefined') {

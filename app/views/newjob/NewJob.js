@@ -122,26 +122,6 @@ const NewJob = (props) => {
               <CInput id="excludeTagInput" onChange={(event) => setExcludeTagInput(event.currentTarget.value)} value={props.props.selection.get('excludeTag')}></CInput>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Select your preprocessing preset if you want to align or load nd2 files.</CLabel>
-              <CSelect value={props.props.selection.get('preprocessing')} onChange={(event) => handlePreprocessingSelection(event.currentTarget.value)} custom name="select" id="selectPreprocessing">
-                <option
-                  value={null}
-                  name='No Preprocessing'
-                  >
-                    No Preprocessing
-                </option>
-                {Array.from( props.props.preprocessing ).map(([key, value]) => {
-                    return props.props.preprocessing.get(key).name &&
-                    (<option
-                    value={key}
-                    name={props.props.preprocessing.get(key).name}
-                    >
-                      {props.props.preprocessing.get(key).name}
-                    </option>
-                  )})}
-              </CSelect>
-            </CFormGroup>
-            <CFormGroup>
               <CLabel>Select your preset for detecting cells.</CLabel>
               <CSelect value={props.props.selection.get('detection')} onChange={(event) => handleDetectionSelection(event.currentTarget.value)} custom name="select" id="selectDetection">
                 <option
@@ -157,6 +137,26 @@ const NewJob = (props) => {
                     name={props.props.detection.get(key).name}
                     >
                       {props.props.detection.get(key).name}
+                    </option>
+                  )})}
+              </CSelect>
+            </CFormGroup>
+            <CFormGroup>
+              <CLabel>Select your preprocessing preset if you want to align or load nd2 files.</CLabel>
+              <CSelect value={props.props.selection.get('preprocessing')} onChange={(event) => handlePreprocessingSelection(event.currentTarget.value)} custom name="select" id="selectPreprocessing">
+                <option
+                  value={null}
+                  name='No Preprocessing'
+                  >
+                    No Preprocessing
+                </option>
+                {Array.from( props.props.preprocessing ).map(([key, value]) => {
+                    return props.props.preprocessing.get(key).name &&
+                    (<option
+                    value={key}
+                    name={props.props.preprocessing.get(key).name}
+                    >
+                      {props.props.preprocessing.get(key).name}
                     </option>
                   )})}
               </CSelect>

@@ -167,15 +167,14 @@ const Annotate = (props) => {
             <CFormGroup>
               <CCol md="8">
                 <CLabel></CLabel>
-                <CLabel>Do you already have results from detection and want to apply a score threshold?</CLabel>
-                <CLabel>A score threshold of 50% as a baseline is highly recommended.</CLabel>
+                <CLabel>Do you want to check your results with a different score threshold?</CLabel>
               </CCol>
               <CCol md="2">
                 <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchThresholds} checked={props.props.get(selectPresetValue).differentThresholds} id="differentThresholds" />
               </CCol>
             </CFormGroup>
             <CCollapse show={thresholdCollapse}>
-              <CFormGroup row>
+              <CFormGroup>
                 <CCol md="8">
                   <CLabel>Set score threshold for mating cells in %.</CLabel>
                 </CCol>
@@ -183,7 +182,7 @@ const Annotate = (props) => {
                   <CInput type='number' min={0} max={100} step={1} defaultValue={props.props.get(selectPresetValue).matingThreshold} onChange={(event) => setMatingThreshold(event.currentTarget.value)}/>
                 </CCol>
               </CFormGroup>
-              <CFormGroup row>
+              <CFormGroup>
                 <CCol md="8">
                   <CLabel>Set score threshold for budding events in %.</CLabel>
                 </CCol>

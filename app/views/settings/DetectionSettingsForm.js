@@ -34,7 +34,10 @@ import { v4 as uuidv4 } from 'uuid';
 const DetectionSettingsForm = (props) => {
   const [selectPresetValue, setselectPresetValue] = React.useState("a809ff23-4235-484f-86f2-e5d87da8333d")
   const [modalAdd, setModalAdd] = React.useState(false)
+  const [zCollapse, setZCollapse] = React.useState(props.props.get(selectPresetValue).zstack);
   const [videoCollapse, setVideoCollapse] = React.useState(props.props.get(selectPresetValue).video);
+  const [advancedCollapse, setAdvancedCollapse] = React.useState(props.props.get(selectPresetValue).advancedSettings);
+  const [superAdvancedCollapse, setSuperAdvancedCollapse] = React.useState(props.props.get(selectPresetValue).superAdvancedSettings);
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
 
@@ -59,6 +62,7 @@ const DetectionSettingsForm = (props) => {
   
   const switchStack = () => {
     props.props.get(selectPresetValue).zstack = !props.props.get(selectPresetValue).zstack
+    setZCollapse(props.props.get(selectPresetValue).zstack)
   }
 
   const switchVideo = () => {
@@ -66,24 +70,56 @@ const DetectionSettingsForm = (props) => {
     setVideoCollapse(props.props.get(selectPresetValue).video)
   }
 
-  const setgraychannel = (value) => {
+  const switchAdvanced = () => {
+    props.props.get(selectPresetValue).advancedSettings = !props.props.get(selectPresetValue).advancedSettings
+
+    setAdvancedCollapse(props.props.get(selectPresetValue).advancedSettings)
+  };
+
+  const switchSuperAdvanced = () => {
+    props.props.get(selectPresetValue).superAdvancedSettings = !props.props.get(selectPresetValue).superAdvancedSettings
+
+    setSuperAdvancedCollapse(props.props.get(selectPresetValue).superAdvancedSettings)
+  };
+
+  const setGrayChannel = (value) => {
     props.props.get(selectPresetValue).graychannel = value
   }
 
-  const setpixelsize = (value) => {
+  const setPixelSize = (value) => {
     props.props.get(selectPresetValue).pixelSize = value
+  }
+
+  const setReferencePixelSize = (value) => {
+    props.props.get(selectPresetValue).referencePixelSize = value
   }
 
   const setIP = (value) => {
     props.props.get(selectPresetValue).ip = value
   }
 
-  const setlowerquantile = (value) => {
+  const setLowerQuantile = (value) => {
     props.props.get(selectPresetValue).lowerQuantile = value
   }
 
-  const setupperquantile = (value) => {
+  const setUpperQuantile = (value) => {
     props.props.get(selectPresetValue).upperQuantile = value
+  }
+
+  const setSingleThreshold = (value) => {
+    props.props.get(selectPresetValue).singleThreshold = value
+  }
+
+  const setMatingThreshold = (value) => {
+    props.props.get(selectPresetValue).matingThreshold = value
+  }
+
+  const setBuddingThreshold = (value) => {
+    props.props.get(selectPresetValue).buddingThreshold = value
+  }
+
+  const setZSlice = (value) => {
+    props.props.get(selectPresetValue).zSlice = value
   }
 
   const handleLocalIPClick = () => {
@@ -102,9 +138,16 @@ const DetectionSettingsForm = (props) => {
       name: NameInput,
       graychannel: props.props.get(selectPresetValue).graychannel,
       pixelSize: props.props.get(selectPresetValue).pixelSize,
+      referencePixelSize: props.props.get(selectPresetValue).referencePixelSize,
+      advancedSettings: props.props.get(selectPresetValue).advancedSettings,
+      superAdvancedSettings: props.props.get(selectPresetValue).superAdvancedSettings,
+      singleThreshold: props.props.get(selectPresetValue).singleThreshold,
+      matingThreshold: props.props.get(selectPresetValue).matingThreshold,
+      buddingThreshold: props.props.get(selectPresetValue).buddingThreshold,
       lowerQuantile: props.props.get(selectPresetValue).lowerQuantile,
       upperQuantile: props.props.get(selectPresetValue).upperQuantile,
       zstack: props.props.get(selectPresetValue).zstack,
+      zSlice: props.props.get(selectPresetValue).zSlice,
       video: props.props.get(selectPresetValue).video,
       frameSelection: props.props.get(selectPresetValue).frameSelection,
       ip: props.props.get(selectPresetValue).ip
@@ -157,38 +200,16 @@ const DetectionSettingsForm = (props) => {
                 </CInputGroupPrepend>
               </CCol>
             </CFormGroup>
+            <CLabel></CLabel>
             <CFormGroup row>
               <CCol md="8">
                 <CLabel>Axis of non-fluorescent (BF/DIC/PH) overview channel.</CLabel>
               </CCol>
               <CCol sm="2">
-                <CInput type='number' min={0} defaultValue={props.props.get(selectPresetValue).graychannel} onChange={(event) => setgraychannel(event.currentTarget.value)}/>
+                <CInput type='number' min={0} defaultValue={props.props.get(selectPresetValue).graychannel} onChange={(event) => setGrayChannel(event.currentTarget.value)}/>
               </CCol>
             </CFormGroup>
-            <CFormGroup row>
-              <CCol md="8">
-                <CLabel>Set pixel size of image in nm.</CLabel>
-              </CCol>
-              <CCol sm="2">
-                <CInput type='number' min={0} max={5000} step={1} defaultValue={props.props.get(selectPresetValue).pixelSize} onChange={(event) => setpixelsize(event.currentTarget.value)}/>
-              </CCol>
-            </CFormGroup>
-            <CFormGroup row>
-              <CCol md="8">
-                <CLabel>Set lower quantile for normalization.</CLabel>
-              </CCol>
-              <CCol md="2">
-                <CInput type='number' min={0} max={50} step={0.5} defaultValue={props.props.get(selectPresetValue).lowerQuantile} onChange={(event) => setlowerquantile(event.currentTarget.value)}/>
-              </CCol>
-            </CFormGroup>
-            <CFormGroup row>
-              <CCol md="8">
-                <CLabel>Set upper quantile for normalization.</CLabel>
-              </CCol>
-              <CCol md="2">
-                <CInput type='number' min={50} max={100} step={0.5} defaultValue={props.props.get(selectPresetValue).upperQuantile} onChange={(event) => setupperquantile(event.currentTarget.value)}/>
-              </CCol>
-            </CFormGroup>
+            <CLabel></CLabel>
             <CFormGroup row>
               <CCol md="8">
                   <CLabel>Is the image a z-stack?</CLabel>
@@ -199,6 +220,17 @@ const DetectionSettingsForm = (props) => {
                 </CFormGroup>
               </CCol>
             </CFormGroup>
+            <CCollapse show={zCollapse}>
+              <CFormGroup row>
+                  <CCol md="8">
+                    <CLabel>Set position of z slice for detection in %.</CLabel>
+                  </CCol>
+                  <CCol md="2">
+                    <CInput type='number' min={0} max={100} step={5} defaultValue={props.props.get(selectPresetValue).zSlice} onChange={(event) => setZSlice(event.currentTarget.value)}/>
+                  </CCol>
+                </CFormGroup>
+              </CCollapse>
+            <CLabel></CLabel>
             <CFormGroup row>
               <CCol md="8">
                   <CLabel>Is the image a time-series?</CLabel>
@@ -217,13 +249,91 @@ const DetectionSettingsForm = (props) => {
                 <CCol md="4">
                   <CFormGroup>
                     <CSelect custom onChange={(event) => setFrameSelection(event.currentTarget.value)} value={props.props.get(selectPresetValue).frameSelection} name="select" id="selectDetection">
-                      <option value={"all"} name='Detection on all frames'>Detection on all frames</option>
                       <option value={"first"} name='>Use first frame as reference.'>Use first frame as reference</option>
                       <option value={"last"} name='Use last frame as reference.'>Use last frame as reference</option>
                     </CSelect>
                   </CFormGroup>
                 </CCol>
               </CFormGroup>
+            </CCollapse>
+            <CLabel></CLabel>
+            <CFormGroup row>
+              <CCol md="8">
+                <CLabel></CLabel>
+                <CLabel>Do you want to change advanced settings?</CLabel>
+              </CCol>
+              <CCol md="2">
+                <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchAdvanced} checked={props.props.get(selectPresetValue).advancedSettings} id="differentThresholds" />
+              </CCol>
+            </CFormGroup>
+            <CCollapse show={advancedCollapse}>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel>Set pixel size of image in nm.  Images are resized to a reference pixel size of 110nm.</CLabel>
+                </CCol>
+                <CCol sm="2">
+                  <CInput type='number' min={10} max={1000} step={1} defaultValue={props.props.get(selectPresetValue).pixelSize} onChange={(event) => setPixelSize(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel>Set lower quantile for normalization in %.</CLabel>
+                </CCol>
+                <CCol md="2">
+                  <CInput type='number' min={0} max={50} step={0.5} defaultValue={props.props.get(selectPresetValue).lowerQuantile} onChange={(event) => setLowerQuantile(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel>Set upper quantile for normalization in %.</CLabel>
+                </CCol>
+                <CCol md="2">
+                  <CInput type='number' min={50} max={100} step={0.5} defaultValue={props.props.get(selectPresetValue).upperQuantile} onChange={(event) => setUpperQuantile(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel>Set score threshold for single cells in %.</CLabel>
+                </CCol>
+                <CCol md="2">
+                  <CInput type='number' min={0} max={100} step={1} defaultValue={props.props.get(selectPresetValue).singleThreshold} onChange={(event) => setSingleThreshold(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel>Set score threshold for mating cells in %.</CLabel>
+                </CCol>
+                <CCol md="2">
+                  <CInput type='number' min={0} max={100} step={1} defaultValue={props.props.get(selectPresetValue).matingThreshold} onChange={(event) => setMatingThreshold(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel>Set score threshold for budding events in %.</CLabel>
+                </CCol>
+                <CCol md="2">
+                  <CInput type='number' min={0} max={100} step={1} defaultValue={props.props.get(selectPresetValue).buddingThreshold} onChange={(event) => setBuddingThreshold(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel></CLabel>
+                  <CLabel>Did you train your own model?</CLabel>
+                </CCol>
+                <CCol md="2">
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchSuperAdvanced} checked={props.props.get(selectPresetValue).superAdvancedSettings} id="superAdvancedSettingsSwitch" />
+                </CCol>
+            </CFormGroup>
+            <CCollapse show={superAdvancedCollapse}>
+              <CFormGroup row>
+                  <CCol md="8">
+                    <CLabel>Set the reference pixel size of your training images in nm.</CLabel>
+                  </CCol>
+                  <CCol sm="2">
+                    <CInput type='number' min={1} max={1000} step={1} defaultValue={props.props.get(selectPresetValue).referencePixelSize} onChange={(event) => setReferencePixelSize(event.currentTarget.value)}/>
+                  </CCol>
+                </CFormGroup>
+            </CCollapse>
             </CCollapse>
           </CForm>
           <CModal 

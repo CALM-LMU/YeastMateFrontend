@@ -13,7 +13,7 @@ export default [
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Annotate your images',
+    name: 'Visualize / Annotate',
     to: '/annotate',
     icon: 'cil-speedometer',
   },
@@ -23,14 +23,14 @@ export default [
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Preprocessing',
-    to: '/preprocessing',
+    name: 'Detection',
+    to: '/detection',
     icon: 'cil-align-left',
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Detection',
-    to: '/detection',
+    name: 'Preprocessing',
+    to: '/preprocessing',
     icon: 'cil-align-left',
   },
   {

@@ -33,26 +33,18 @@ annotationPresetList.set("821198b7-83e5-4ccb-9579-48f5f7849221", {
 preprocessingPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
   name: "Default",
   alignment: false,
-  inputFileFormat: '.nd2',
   videoSplit: false,
   channels: [
     {"Camera":1,"Channel":1,"DIC":"True","Delete":"Keep"},
     {"Camera":2,"Channel":2,"DIC":"True","Delete":"Delete"},
     {"Camera":1,"Channel":3,"DIC":"False","Delete":"Keep"},
     {"Camera":2,"Channel":4,"DIC":"False","Delete":"Keep"}
-  ],
-  dimensions: [
-    {"Dimension":"FOV","index":0,"status":"Existing"},
-    {"Dimension":"Time","index":1,"status":"Existing"},
-    {"Dimension":"Z-Stack","index":2,"status":"Existing"},
-    {"Dimension":"Channels","index":3,"status":"Existing"},
-    {"Dimension":"Height","index":4,"status":"Existing"},
-    {"Dimension":"Width","index":5,"status":"Existing"}
-  ] 
+  ]
 })
 
 detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     name: "Default",
+    channelSwitch: false,
     graychannel: 0,
     zstack: false,
     zSlice: 50,

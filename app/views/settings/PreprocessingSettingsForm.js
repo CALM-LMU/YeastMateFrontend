@@ -33,25 +33,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { v4 as uuidv4 } from 'uuid';
 
-const osmanBuild = true;
-
 const cameraFields = [
   { key: 'Channel', _style: { width: '30%'} },
   { key: 'Camera', _style: { width: '10%'} },
   { key: 'Reference channel', _style: { width: '10%'} },
   { key: 'Delete', _style: { width: '15%'} },
-  {
-    key: 'toggle',
-    label: '',
-    _style: { width: '20%' },
-    sorter: false,
-    filter: false
-  }
-]
-
-const dimensionFields = [
-  { key: 'Dimension', _style: { width: '53%'} },
-  { key: 'status', _style: { width: '18%'} },
   {
     key: 'toggle',
     label: '',
@@ -85,21 +71,12 @@ const getDeleteBadge = (Delete) => {
   }
 }
 
-const getDimensionBadge = (status) => {
-  switch (status) {
-    case 'Existing': return 'success'
-    case 'Not Existing': return 'secondary'
-    default: return 'primary'
-  }
-}
-
 const PreprocessingSettingsForm = (props) => {
   const [selectPresetValue, setselectPresetValue] = React.useState("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed")
   const [modalAdd, setModalAdd] = React.useState(false)
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
   const [alignCollapse, setAlignCollapse] = React.useState(props.props.get(selectPresetValue).alignment);
-  const [tifCollapse, setTifCollapse] = React.useState(false);
 
   const [toasts, setToasts] = React.useState([
     {}
@@ -119,12 +96,6 @@ const PreprocessingSettingsForm = (props) => {
       { autohide: true && 2000, closeButton:true, fade:true, header:header, body:body, show:true }
     ])
   }
-  
-  const array_move = (arr, old_index, new_index) => {
-    if (new_index <= arr.length) {
-      arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-    }
-  };
   
   const toggleCameraStatus = (index) => {
     if (props.props.get(selectPresetValue).channels[index].Camera === 1) {
@@ -159,17 +130,6 @@ const PreprocessingSettingsForm = (props) => {
     }
    }; 
 
-  const toggleDimensionStatus = (index) => {
-    if (props.props.get(selectPresetValue).dimensions[index].status === 'Not Existing') {
-      props.props.get(selectPresetValue).dimensions[index].status = 'Existing'
-      props.props.get(selectPresetValue).dimensions = [...props.props.get(selectPresetValue).dimensions]
-   }
-    else if (props.props.get(selectPresetValue).dimensions[index].status === 'Existing') {
-      props.props.get(selectPresetValue).dimensions[index].status = 'Not Existing'
-      props.props.get(selectPresetValue).dimensions = [...props.props.get(selectPresetValue).dimensions]
-    }
-  };
-
   const handleChannelAdd = () => {
     props.props.get(selectPresetValue).channels.push({"Channel": props.props.get(selectPresetValue).channels.length+1, 'DIC':"False", 'Camera': 1, 'Delete':'Keep'})
     props.props.get(selectPresetValue).channels = [...props.props.get(selectPresetValue).channels]
@@ -178,20 +138,6 @@ const PreprocessingSettingsForm = (props) => {
   const handleChannelRemove = () => {
     props.props.get(selectPresetValue).channels.pop()
     props.props.get(selectPresetValue).channels = [...props.props.get(selectPresetValue).channels]
-  };
-
-  const handleUp = (index) => {
-    if (index-1 >= 0) {
-      array_move(props.props.get(selectPresetValue).dimensions, index, index-1)
-      props.props.get(selectPresetValue).dimensions = [...props.props.get(selectPresetValue).dimensions]
-    } 
-  };
-
-  const handleDown = (index) => {
-    if (index+1 <= props.props.get(selectPresetValue).dimensions.length) {
-      array_move(props.props.get(selectPresetValue).dimensions, index, index+1)
-      props.props.get(selectPresetValue).dimensions = [...props.props.get(selectPresetValue).dimensions]
-    }
   };
 
   const switchAlignment = () => {
@@ -212,10 +158,8 @@ const PreprocessingSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       alignment: props.props.get(selectPresetValue).alignment,
-      inputFileFormat: props.props.get(selectPresetValue).inputFileFormat,
       videoSplit: props.props.get(selectPresetValue).videoSplit,
       channels: props.props.get(selectPresetValue).channels,
-      dimensions: props.props.get(selectPresetValue).dimensions
     })
 
     setselectPresetValue(id)
@@ -233,15 +177,6 @@ const PreprocessingSettingsForm = (props) => {
       addToast('Error', 'Default preset can not be deleted.');
     }
   }; 
-
-  React.useEffect(() => {
-    if (props.props.get(selectPresetValue).inputFileFormat === '.nd2') {
-      setTifCollapse(false)
-    }
-    else if (props.props.get(selectPresetValue).inputFileFormat === '.tif') {
-      setTifCollapse(true)
-    }
-  }, [props.props.get(selectPresetValue).inputFileFormat])
 
   return (
     <>
@@ -267,14 +202,6 @@ const PreprocessingSettingsForm = (props) => {
             <CFormGroup>
               <CLabel>Preprocessing will convert nd2 or tif files into detection-compatible tif files.</CLabel>
             </CFormGroup>
-            <CFormGroup>
-              <CLabel>Select input image file type.</CLabel>
-              <CSelect onChange={(event) => props.props.get(selectPresetValue).inputFileFormat = event.currentTarget.value} value={props.props.get(selectPresetValue).inputFileFormat} custom name="select" id="select">
-                <option>.nd2</option>
-                <option>.tif</option>
-              </CSelect>
-            </CFormGroup>
-            <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup>
               <CLabel>It can also perform additional alignment of different image channels if they were acquired with multiple microscope cameras.</CLabel>
             </CFormGroup>
@@ -349,59 +276,18 @@ const PreprocessingSettingsForm = (props) => {
                 <FontAwesomeIcon icon="ban"/>   Remove Channel
               </CButton>
             </CFormGroup>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
             </CCollapse>
-            <CCollapse show={tifCollapse}>
-              <CFormGroup>
-                <CLabel>Select the order of dimensions within the tiff stack.</CLabel>
-              </CFormGroup>
-              <CFormGroup>
-                <CDataTable
-                items={props.props.get(selectPresetValue).dimensions}
-                fields={dimensionFields}
-                itemsPerPage={10}
-                hover
-                scopedSlots = {{
-                  'status':
-                    (item)=>(
-                      <td>
-                        <CBadge color={getDimensionBadge(item.status)}>
-                          {item.status}
-                        </CBadge>
-                      </td>
-                    ),
-                    'toggle':
-                      (item, index)=>{
-                        return (
-                          <CButtonGroup>
-                            <CButton onClick={()=>{toggleDimensionStatus(index)}} color="dark" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="sync"/>   Toggle Status
-                            </CButton>
-                            <CButton onClick={()=>{handleUp(index)}} color="dark" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="arrow-up"/>   Move Up
-                            </CButton>
-                            <CButton onClick={()=>{handleDown(index)}} color="dark" size="sm" variant="outline">
-                              <FontAwesomeIcon icon="arrow-down"/>   Move Down
-                            </CButton>
-                          </CButtonGroup>
-                      )
-                    }
-                  }}
-                />
-              </CFormGroup>
-            </CCollapse>
-            <CCollapse show={osmanBuild}>
-              <CFormGroup><CLabel></CLabel></CFormGroup>
-              <CFormGroup row>
-                <CCol md="3">
-                    <CLabel>Split videos into single frames?</CLabel>
-                </CCol>
-                <CCol md="9">
-                  <CFormGroup>
-                    <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
-                  </CFormGroup>
-                </CCol>
-              </CFormGroup>
-            </CCollapse>
+            <CFormGroup row>
+              <CCol md="3">
+                  <CLabel>Split videos into single frames?</CLabel>
+              </CCol>
+              <CCol md="9">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
+                </CFormGroup>
+              </CCol>
+            </CFormGroup>
           </CForm>
           <CModal 
             show={modalAdd} 

@@ -34,6 +34,7 @@ import { v4 as uuidv4 } from 'uuid';
 const DetectionSettingsForm = (props) => {
   const [selectPresetValue, setselectPresetValue] = React.useState("a809ff23-4235-484f-86f2-e5d87da8333d")
   const [modalAdd, setModalAdd] = React.useState(false)
+  const [channelCollapse, setChannelCollapse] = React.useState(props.props.get(selectPresetValue).channelSwitch);
   const [zCollapse, setZCollapse] = React.useState(props.props.get(selectPresetValue).zstack);
   const [videoCollapse, setVideoCollapse] = React.useState(props.props.get(selectPresetValue).video);
   const [advancedCollapse, setAdvancedCollapse] = React.useState(props.props.get(selectPresetValue).advancedSettings);
@@ -58,6 +59,11 @@ const DetectionSettingsForm = (props) => {
       ...toasts, 
       { autohide: true && 2000, closeButton:true, fade:true, header:header, body:body, show:true }
     ])
+  }
+
+  const switchChannel = () => {
+    props.props.get(selectPresetValue).channelSwitch = !props.props.get(selectPresetValue).channelSwitch
+    setChannelCollapse(props.props.get(selectPresetValue).channelSwitch)
   }
   
   const switchStack = () => {
@@ -136,6 +142,7 @@ const DetectionSettingsForm = (props) => {
     const id = uuidv4()
     props.props.set(id, {
       name: NameInput,
+      channelSwitch: props.props.get(selectPresetValue).channelSwitch,
       graychannel: props.props.get(selectPresetValue).graychannel,
       pixelSize: props.props.get(selectPresetValue).pixelSize,
       referencePixelSize: props.props.get(selectPresetValue).referencePixelSize,
@@ -200,15 +207,27 @@ const DetectionSettingsForm = (props) => {
                 </CInputGroupPrepend>
               </CCol>
             </CFormGroup>
-            <CLabel></CLabel>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup row>
               <CCol md="8">
-                <CLabel>Axis of non-fluorescent (BF/DIC/PH) overview channel.</CLabel>
+                  <CLabel>Does the image have multiple channels?</CLabel>
               </CCol>
-              <CCol sm="2">
-                <CInput type='number' min={0} defaultValue={props.props.get(selectPresetValue).graychannel} onChange={(event) => setGrayChannel(event.currentTarget.value)}/>
+              <CCol md="3">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchChannel} checked={props.props.get(selectPresetValue).channelSwitch} id="stackYes"/>
+                </CFormGroup>
               </CCol>
             </CFormGroup>
+            <CCollapse show={channelCollapse}>
+              <CFormGroup row>
+                <CCol md="8">
+                  <CLabel>Axis of non-fluorescent (BF/DIC/PH) overview channel.</CLabel>
+                </CCol>
+                <CCol sm="2">
+                  <CInput type='number' min={0} defaultValue={props.props.get(selectPresetValue).graychannel} onChange={(event) => setGrayChannel(event.currentTarget.value)}/>
+                </CCol>
+              </CFormGroup>
+            </CCollapse>
             <CLabel></CLabel>
             <CFormGroup row>
               <CCol md="8">

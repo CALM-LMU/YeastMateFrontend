@@ -85,7 +85,7 @@ const Annotate = (props) => {
       let matingThreshold = props.props.get(selectPresetValue).matingThreshold / 100; 
       let buddingThreshold = props.props.get(selectPresetValue).buddingThreshold / 100; 
 
-      scoreThresholds = "1=" + matingThreshold.toString() + ";2=" + buddingThreshold.toString()
+      scoreThresholds = "1S" + matingThreshold.toString() + "C2S" + buddingThreshold.toString()
     }
 
     ipcRenderer.send('start-napari', props.props.get(selectPresetValue).path, scoreThresholds)

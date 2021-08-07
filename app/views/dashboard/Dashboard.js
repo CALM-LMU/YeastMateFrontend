@@ -1,4 +1,7 @@
 import React from 'react'
+
+import { observer } from "mobx-react-lite"
+
 import {
   CBadge,
   CCard,
@@ -27,13 +30,14 @@ const getStatusBadge = (status)=>{
   }
 }
 
-const Dashboard = () => {
+const Dashboard = (props) => {
   const [jobList, setjobList] = React.useState([])
 
   const get_jobs = async () => {
+    console.log(props.props.get('ip')  + ":" + props.props.get('port'))
     try {
       const result = await axios(
-        'http://127.0.0.1:5005/',
+        props.props.get('ip') + ":" + props.props.get('port'),
       );
       setjobList(result.data.tasks);
     } catch (error) {
@@ -85,4 +89,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default observer(Dashboard)

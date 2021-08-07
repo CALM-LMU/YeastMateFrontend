@@ -14,6 +14,7 @@ const Annotate = React.lazy(() => import('./views/annotate/Annotate'));
 const store = new Store();
 
 var sidebarShow = observable(new Map())
+var dashboardPort = observable(new Map())
 var presetSelection = observable(new Map())
 var annotationPresetList= observable(new Map())
 var preprocessingPresetList = observable(new Map())
@@ -126,11 +127,12 @@ else {
 
 portscanner.findAPortNotInUse(11001, 11201, '127.0.0.1', function(error, port) {
   presetSelection.set('port', port)
+  presetSelection.set('originalPort', port)
 })
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
+  { path: '/dashboard', name: 'Dashboard', component: Dashboard , data: presetSelection },
   { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
   { path: '/annotate', name: 'Annotate your data', component: Annotate, data: annotationPresetList },
   { path: '/preprocessing', name: 'Preprocessing Settings', component: PreprocessingSettings, data: preprocessingPresetList },
@@ -138,6 +140,6 @@ const routes = [
   { path: '/export', name: 'Export Settings', component: ExportSettings, data: exportPresetList },
 ];
 
-const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { selection: presetSelection, annotation: annotationPresetList, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
+const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { port:presetSelection, selection: presetSelection, annotation: annotationPresetList, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
 
 export default prop;

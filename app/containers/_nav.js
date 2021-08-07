@@ -1,14 +1,14 @@
 export default [
   {
     _tag: 'CSidebarNavItem',
-    name: 'Dashboard',
-    to: '/dashboard',
+    name: 'Start new job',
+    to: '/job',
     icon: 'cil-speedometer',
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Start new job',
-    to: '/job',
+    name: 'Dashboard',
+    to: '/dashboard',
     icon: 'cil-speedometer',
   },
   {

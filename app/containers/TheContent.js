@@ -32,7 +32,7 @@ const TheContent = (props) => {
                   )} />
               )
             })}
-            <Redirect from="/" to="/dashboard" />
+            <Redirect from="/" to="/job" />
           </Switch>
         </Suspense>
       </CContainer>

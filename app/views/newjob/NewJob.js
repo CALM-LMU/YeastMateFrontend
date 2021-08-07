@@ -31,6 +31,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 const NewJob = (props) => {
   const [toasts, setToasts] = React.useState([{}])
   const [tempIP, setTempIP] = React.useState(props.props.selection.get('ip'));
+  const [tempPort, setTempPort] = React.useState(props.props.selection.get('port'));
   const [externalCollapse, setExternalCollapse] = React.useState(props.props.selection.get('external'));
 
   const handleAddPathClick = () => {
@@ -87,10 +88,14 @@ const NewJob = (props) => {
 
     if (props.props.selection.get('external') === false) {
       setTempIP(props.props.selection.get('ip'))
+      setTempPort(props.props.selection.get('ip'))
+
       props.props.selection.set('ip', '127.0.0.1')
+      props.props.selection.set('port', props.props.selection.get('originalPort'))
     }
     else {
       props.props.selection.set('ip', tempIP)
+      props.props.selection.set('port', tempPort)
     }
 
     setExternalCollapse(props.props.selection.get('external'))
@@ -98,6 +103,10 @@ const NewJob = (props) => {
 
   const setIP = (value) => {
     props.props.selection.set('ip', value)
+  }
+  
+  const setPort = (value) => {
+    props.props.selection.set('port', value)
   }
 
   const submitJob = () => {
@@ -222,6 +231,14 @@ const NewJob = (props) => {
                   </CCol>
                   <CCol md='2'>
                     <CInput defaultValue={props.props.selection.get('ip')} onChange={(event) => setIP(event.currentTarget.value)}/>
+                  </CCol>
+                </CFormGroup>
+                <CFormGroup row>
+                  <CCol md='8'>
+                    <CLabel>Set port of external server.</CLabel>
+                  </CCol>
+                  <CCol md='2'>
+                    <CInput defaultValue={props.props.selection.get('port')} onChange={(event) => setPort(event.currentTarget.value)}/>
                   </CCol>
                 </CFormGroup>
               </CCollapse>

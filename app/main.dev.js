@@ -16,6 +16,7 @@ const upath = require('upath');
 
 const {shell} = require('electron');
 const spawn = require("child_process").spawn;
+const { exec } = require("child_process");
 
 let mainWindow = null;
 
@@ -59,7 +60,12 @@ ipcMain.on('open-file-dialog-for-file', function (event) {
 
 ipcMain.on('start-napari', (event, path, scoreThresholds) => {
   if (os.platform() === 'linux') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`));
+		let bat = spawn('gnome-terminal', [
+		'-e',
+		'/home/bunk/BioElectron/python/YeastMate/YeastMateIO',
+		path,
+		scoreThresholds
+		]);
   }
   if (os.platform() === 'darwin') {
     let bat = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`), [
@@ -85,16 +91,6 @@ app.on('ready', async () => {
     await installExtensions();
   }
 
-  if (os.platform() === 'linux') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`));
-  }
-  if (os.platform() === 'darwin') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`))
-  }
-  if (os.platform() === 'win32') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`))
-  }
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1200,
@@ -113,6 +109,16 @@ app.on('ready', async () => {
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
   mainWindow.webContents.on('did-finish-load', () => {
+  	if (os.platform() === 'linux') {
+			let op = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateIO']);
+			op.on ('error', (err) => { console.log (err); });
+		}
+		if (os.platform() === 'darwin') {
+		  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`))
+		}
+		if (os.platform() === 'win32') {
+		  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`))
+		}
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
@@ -123,7 +129,7 @@ app.on('ready', async () => {
       mainWindow.focus();
     }
   });
-
+  
   mainWindow.on('closed', () => {
     mainWindow = null;
   });

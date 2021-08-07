@@ -1,7 +1,7 @@
 {
   "name": "yeastmate",
   "productName": "yeastmate",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "YeastMate Electron/React Interface using BioDetectron",
   "main": "./main.prod.js",
   "author": {

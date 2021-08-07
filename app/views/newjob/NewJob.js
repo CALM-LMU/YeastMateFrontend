@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { observer } from "mobx-react-lite"
+import { observer } from 'mobx-react-lite'
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 const path = require('path');
@@ -12,12 +12,15 @@ import {
   CCardBody,
   CCardFooter,
   CCardHeader,
+  CCol,
+  CCollapse,
   CForm,
   CFormGroup,
   CInput,
   CInputGroupAppend,
   CLabel,
   CSelect,
+  CSwitch,
   CToast,
   CToastBody,
   CToastHeader,
@@ -27,6 +30,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const NewJob = (props) => {
   const [toasts, setToasts] = React.useState([{}])
+  const [tempIP, setTempIP] = React.useState(props.props.selection.get('ip'));
+  const [externalCollapse, setExternalCollapse] = React.useState(props.props.selection.get('external'));
 
   const handleAddPathClick = () => {
     var selectedPath = dialog.showOpenDialog({
@@ -77,10 +82,28 @@ const NewJob = (props) => {
     props.props.selection.set('export', value)
   }
 
+  const switchExternal = () => {
+    props.props.selection.set('external', !props.props.selection.get('external'))
+
+    if (props.props.selection.get('external') === false) {
+      setTempIP(props.props.selection.get('ip'))
+      props.props.selection.set('ip', '127.0.0.1')
+    }
+    else {
+      props.props.selection.set('ip', tempIP)
+    }
+
+    setExternalCollapse(props.props.selection.get('external'))
+  }
+
+  const setIP = (value) => {
+    props.props.selection.set('ip', value)
+  }
+
   const submitJob = () => {
-    console.log('http://127.0.0.1:'+props.props.selection.get('port'))
+    console.log(props.props.selection.get('ip'))
     axios.post(
-      'http://127.0.0.1:'+props.props.selection.get('port'),
+      'http://' + props.props.selection.get('ip') + ':' + props.props.selection.get('port'),
       {
         _id: uuidv4(),
         path: path.normalize(props.props.selection.get('path')),
@@ -109,21 +132,21 @@ const NewJob = (props) => {
             <CFormGroup>
               <CLabel>Path:</CLabel>
               <CInputGroupAppend>
-                <CInput id="pathInput" onChange={(event) => setPathInput(event.currentTarget.value)} value={props.props.selection.get('path')}></CInput>
-                <CButton onClick={handleAddPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
+                <CInput id='pathInput' onChange={(event) => setPathInput(event.currentTarget.value)} value={props.props.selection.get('path')}></CInput>
+                <CButton onClick={handleAddPathClick} size='sm' color='primary'><FontAwesomeIcon icon='plus' /> Select Path</CButton>
               </CInputGroupAppend>
             </CFormGroup>
             <CFormGroup>
               <CLabel>Include only files with following tag:</CLabel>
-              <CInput id="includeTagInput" onChange={(event) => setIncludeTagInput(event.currentTarget.value)} value={props.props.selection.get('includeTag')}></CInput>
+              <CInput id='includeTagInput' onChange={(event) => setIncludeTagInput(event.currentTarget.value)} value={props.props.selection.get('includeTag')}></CInput>
             </CFormGroup>
             <CFormGroup>
               <CLabel>Exclude files with following tag:</CLabel>
-              <CInput id="excludeTagInput" onChange={(event) => setExcludeTagInput(event.currentTarget.value)} value={props.props.selection.get('excludeTag')}></CInput>
+              <CInput id='excludeTagInput' onChange={(event) => setExcludeTagInput(event.currentTarget.value)} value={props.props.selection.get('excludeTag')}></CInput>
             </CFormGroup>
             <CFormGroup>
               <CLabel>Select your preset for detecting cells.</CLabel>
-              <CSelect value={props.props.selection.get('detection')} onChange={(event) => handleDetectionSelection(event.currentTarget.value)} custom name="select" id="selectDetection">
+              <CSelect value={props.props.selection.get('detection')} onChange={(event) => handleDetectionSelection(event.currentTarget.value)} custom name='select' id='selectDetection'>
                 <option
                   value={null}
                   name='No detection'
@@ -143,7 +166,7 @@ const NewJob = (props) => {
             </CFormGroup>
             <CFormGroup>
               <CLabel>Select your preprocessing preset if you want to align or load nd2 files.</CLabel>
-              <CSelect value={props.props.selection.get('preprocessing')} onChange={(event) => handlePreprocessingSelection(event.currentTarget.value)} custom name="select" id="selectPreprocessing">
+              <CSelect value={props.props.selection.get('preprocessing')} onChange={(event) => handlePreprocessingSelection(event.currentTarget.value)} custom name='select' id='selectPreprocessing'>
                 <option
                   value={null}
                   name='No Preprocessing'
@@ -163,7 +186,7 @@ const NewJob = (props) => {
             </CFormGroup>
             <CFormGroup>
               <CLabel>Select your preset for exporting detections.</CLabel>
-              <CSelect value={props.props.selection.get('export')} onChange={(event) => handleExportSelection(event.currentTarget.value)} custom name="select" id="selectExport">
+              <CSelect value={props.props.selection.get('export')} onChange={(event) => handleExportSelection(event.currentTarget.value)} custom name='select' id='selectExport'>
                 <option
                   value={null}
                   name='No export'
@@ -181,10 +204,31 @@ const NewJob = (props) => {
                   )})}
               </CSelect>
             </CFormGroup>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
+            <CFormGroup row>
+              <CCol md='8'>
+                  <CLabel>Do you run the python backend on an external system?</CLabel>
+              </CCol>
+              <CCol md='3'>
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchExternal} checked={props.props.selection.get('external')} id='stackYes'/>
+                </CFormGroup>
+              </CCol>
+            </CFormGroup>
+            <CCollapse show={externalCollapse}>
+              <CFormGroup row>
+                  <CCol md='8'>
+                    <CLabel>Set IP adress of external server.</CLabel>
+                  </CCol>
+                  <CCol md='2'>
+                    <CInput defaultValue={props.props.selection.get('ip')} onChange={(event) => setIP(event.currentTarget.value)}/>
+                  </CCol>
+                </CFormGroup>
+              </CCollapse>
           </CForm>
         </CCardBody>
         <CCardFooter>
-          <CButton type="submit" size="sm" onClick={submitJob} color="primary"><FontAwesomeIcon icon="upload" /> Submit</CButton>
+          <CButton type='submit' size='sm' onClick={submitJob} color='primary'><FontAwesomeIcon icon='upload' /> Submit</CButton>
         </CCardFooter>
       </CCard>
       {Object.keys(toasters).map((toasterKey) => (

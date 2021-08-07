@@ -22,28 +22,28 @@ var exportPresetList = observable(new Map())
 
 sidebarShow.set('show', 'responsive')
 
-annotationPresetList.set("821198b7-83e5-4ccb-9579-48f5f7849221", {
-  name: "Default",
-  path: "",
+annotationPresetList.set('821198b7-83e5-4ccb-9579-48f5f7849221', {
+  name: 'Default',
+  path: '',
   differentThresholds: false,
   matingThreshold: 50,
   buddingThreshold: 50
 })
 
-preprocessingPresetList.set("1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed", {
-  name: "Default",
+preprocessingPresetList.set('1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', {
+  name: 'Default',
   alignment: false,
   videoSplit: false,
   channels: [
-    {"Camera":1,"Channel":1,"DIC":"True","Delete":"Keep"},
-    {"Camera":2,"Channel":2,"DIC":"True","Delete":"Delete"},
-    {"Camera":1,"Channel":3,"DIC":"False","Delete":"Keep"},
-    {"Camera":2,"Channel":4,"DIC":"False","Delete":"Keep"}
+    {'Camera':1,'Channel':1,'DIC':'True','Delete':'Keep'},
+    {'Camera':2,'Channel':2,'DIC':'True','Delete':'Delete'},
+    {'Camera':1,'Channel':3,'DIC':'False','Delete':'Keep'},
+    {'Camera':2,'Channel':4,'DIC':'False','Delete':'Keep'}
   ]
 })
 
-detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
-    name: "Default",
+detectPresetList.set('a809ff23-4235-484f-86f2-e5d87da8333d', {
+    name: 'Default',
     channelSwitch: false,
     graychannel: 0,
     zstack: false,
@@ -58,17 +58,17 @@ detectPresetList.set("a809ff23-4235-484f-86f2-e5d87da8333d", {
     singleThreshold: 90,
     matingThreshold: 50,
     buddingThreshold: 50,
-    frameSelection: "all",
-    ip: "127.0.0.1:5000"
+    frameSelection: 'all',
+    ip: '127.0.0.1:5000'
  })
 
-exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
-  name: "Default",
+exportPresetList.set('1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f', {
+  name: 'Default',
   crop: false,
   classes: [
-    {"Class ID":0,"Tag":"Single cells","Crop":"False"},
-    {"Class ID":1,"Tag":"Mating zygotes","Crop":"True"},
-    {"Class ID":2,"Tag":"Budding events","Crop":"True"},
+    {'Class ID':0,'Tag':'Single cells','Crop':'False'},
+    {'Class ID':1,'Tag':'Mating zygotes','Crop':'True'},
+    {'Class ID':2,'Tag':'Budding events','Crop':'True'},
   ],
   boxExpansion: false,
   boxSize: 200,
@@ -78,7 +78,7 @@ exportPresetList.set("1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f", {
 
 if (typeof store.get('annotation') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('annotation'))) {
-    if (key !== "821198b7-83e5-4ccb-9579-48f5f7849221") {
+    if (key !== '821198b7-83e5-4ccb-9579-48f5f7849221') {
       preprocessingPresetList.set(key, value)
     }
   }
@@ -86,7 +86,7 @@ if (typeof store.get('annotation') !== 'undefined') {
 
 if (typeof store.get('preprocessing') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('preprocessing'))) {
-    if (key !== "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed") {
+    if (key !== '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed') {
       preprocessingPresetList.set(key, value)
     }
   }
@@ -94,7 +94,7 @@ if (typeof store.get('preprocessing') !== 'undefined') {
 
 if (typeof store.get('detection') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('detection'))) {
-    if (key !== "a809ff23-4235-484f-86f2-e5d87da8333d") {
+    if (key !== 'a809ff23-4235-484f-86f2-e5d87da8333d') {
       detectPresetList.set(key, value)
     }
   }
@@ -102,7 +102,7 @@ if (typeof store.get('detection') !== 'undefined') {
 
 if (typeof store.get('export') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('export'))) {
-    if (key !== "1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f") {
+    if (key !== '1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f') {
       exportPresetList.set(key, value)
     }
   }
@@ -114,12 +114,14 @@ if (typeof store.get('selection') !== 'undefined') {
   }
 }
 else {
-  presetSelection.set('path', "")
-  presetSelection.set('includeTag', "")
-  presetSelection.set('excludeTag', "")
+  presetSelection.set('path', '')
+  presetSelection.set('includeTag', '')
+  presetSelection.set('excludeTag', '')
   presetSelection.set('preprocessing', null)
-  presetSelection.set('detection', "a809ff23-4235-484f-86f2-e5d87da8333d")
+  presetSelection.set('detection', 'a809ff23-4235-484f-86f2-e5d87da8333d')
   presetSelection.set('export', null)
+  presetSelection.set('external', false)
+  presetSelection.set('ip', '127.0.0.1')
 }
 
 portscanner.findAPortNotInUse(11001, 11201, '127.0.0.1', function(error, port) {

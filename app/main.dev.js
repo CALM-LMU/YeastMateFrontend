@@ -59,10 +59,10 @@ ipcMain.on('open-file-dialog-for-file', function (event) {
 
 ipcMain.on('start-napari', (event, path, scoreThresholds) => {
   if (os.platform() === 'linux') {
-    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMateBackend`));
+    shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`));
   }
   if (os.platform() === 'darwin') {
-    let bat = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastmateAnnotation`), [
+    let bat = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`), [
       path,
       scoreThresholds
   ]);

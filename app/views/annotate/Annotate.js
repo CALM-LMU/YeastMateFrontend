@@ -74,7 +74,7 @@ const Annotate = (props) => {
   }
 
   const submitJob = () => {
-    var scoreThresholds = "1=0;2=0";
+    var scoreThresholds = "1S0C2S0";
 
     if (props.props.get(selectPresetValue).path == "") {
       addToast('Error', 'Path to images must be set.');

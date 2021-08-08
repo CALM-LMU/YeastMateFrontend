@@ -60,12 +60,11 @@ ipcMain.on('open-file-dialog-for-file', function (event) {
 
 ipcMain.on('start-napari', (event, path, scoreThresholds) => {
   if (os.platform() === 'linux') {
-		let bat = spawn('gnome-terminal', [
+		let an = spawn('gnome-terminal', [
 		'-e',
-		'/home/bunk/BioElectron/python/YeastMate/YeastMateIO',
-		path,
-		scoreThresholds
+		'/home/bunk/BioElectron/python/YeastMate/YeastMateAnnotation ' + path + ' ' + scoreThresholds
 		]);
+    an.on ('error', (err) => { console.log (err); });
   }
   if (os.platform() === 'darwin') {
     let bat = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`), [

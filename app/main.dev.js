@@ -111,16 +111,16 @@ app.on('ready', async () => {
   	if (os.platform() === 'linux') {
 			let op = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateIO']);
 			op.on ('error', (err) => { console.log (err); });
-      let det = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateDetection']);
+      let det = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateDetector']);
 			det.on ('error', (err) => { console.log (err); });
 		}
 		if (os.platform() === 'darwin') {
 		  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`))
-      shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetection`))
+      shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`))
 		}
 		if (os.platform() === 'win32') {
 		  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`))
-      shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetection.exe`))
+      shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector.exe`))
 		}
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');

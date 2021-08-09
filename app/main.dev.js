@@ -109,9 +109,9 @@ app.on('ready', async () => {
 
   mainWindow.webContents.on('did-finish-load', () => {
   	if (os.platform() === 'linux') {
-			let op = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateIO']);
+			let op = spawn('gnome-terminal', ['-e', upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`)]);
 			op.on ('error', (err) => { console.log (err); });
-      let det = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateDetector']);
+      let det = spawn('gnome-terminal', ['-e', upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`)]);
 			det.on ('error', (err) => { console.log (err); });
 		}
 		if (os.platform() === 'darwin') {

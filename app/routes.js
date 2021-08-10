@@ -1,7 +1,6 @@
 import React from 'react';
 import { observable } from 'mobx';
 
-var portscanner = require('portscanner');
 const Store = require('electron-store');
 
 const PreprocessingSettings = React.lazy(() => import('./views/settings/PreprocessingSettingsForm'));
@@ -14,7 +13,6 @@ const Annotate = React.lazy(() => import('./views/annotate/Annotate'));
 const store = new Store();
 
 var sidebarShow = observable(new Map())
-var dashboardPort = observable(new Map())
 var presetSelection = observable(new Map())
 var annotationPresetList= observable(new Map())
 var preprocessingPresetList = observable(new Map())
@@ -121,9 +119,9 @@ else {
   presetSelection.set('preprocessing', null)
   presetSelection.set('detection', 'a809ff23-4235-484f-86f2-e5d87da8333d')
   presetSelection.set('export', null)
-  presetSelection.set('external', false)
 }
 
+presetSelection.set('external', false)
 presetSelection.set('ip', '127.0.0.1')
 presetSelection.set('port', 'automatic')
 

@@ -57,8 +57,8 @@ detectPresetList.set('a809ff23-4235-484f-86f2-e5d87da8333d', {
     lowerQuantile: 1,
     upperQuantile:99,
     singleThreshold: 90,
-    matingThreshold: 50,
-    buddingThreshold: 50,
+    matingThreshold: 75,
+    buddingThreshold: 75,
     frameSelection: 'all',
     ip: '127.0.0.1:5000'
  })
@@ -122,13 +122,10 @@ else {
   presetSelection.set('detection', 'a809ff23-4235-484f-86f2-e5d87da8333d')
   presetSelection.set('export', null)
   presetSelection.set('external', false)
-  presetSelection.set('ip', '127.0.0.1')
 }
 
-portscanner.findAPortNotInUse(11001, 11201, '127.0.0.1', function(error, port) {
-  presetSelection.set('port', port)
-  presetSelection.set('originalPort', port)
-})
+presetSelection.set('ip', '127.0.0.1')
+presetSelection.set('port', 'automatic')
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },

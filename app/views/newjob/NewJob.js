@@ -1,10 +1,10 @@
 import React from 'react'
 
 import { observer } from 'mobx-react-lite'
-import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 const path = require('path');
 const { dialog } = require('electron').remote;
+const { ipcRenderer } = require('electron')
 
 import {
   CButton,
@@ -32,6 +32,7 @@ const NewJob = (props) => {
   const [toasts, setToasts] = React.useState([{}])
   const [tempIP, setTempIP] = React.useState(props.props.selection.get('ip'));
   const [tempPort, setTempPort] = React.useState(props.props.selection.get('port'));
+  const [deviceSelect, setDeviceSelect] = React.useState('cpu');
   const [externalCollapse, setExternalCollapse] = React.useState(props.props.selection.get('external'));
 
   const handleAddPathClick = () => {
@@ -83,6 +84,10 @@ const NewJob = (props) => {
     props.props.selection.set('export', value)
   }
 
+  const handleGPUSelection = (value) => {
+    setDeviceSelect(value)
+  }
+
   const switchExternal = () => {
     props.props.selection.set('external', !props.props.selection.get('external'))
 
@@ -91,7 +96,7 @@ const NewJob = (props) => {
       setTempPort(props.props.selection.get('ip'))
 
       props.props.selection.set('ip', '127.0.0.1')
-      props.props.selection.set('port', props.props.selection.get('originalPort'))
+      props.props.selection.set('port','automatic')
     }
     else {
       props.props.selection.set('ip', tempIP)
@@ -110,24 +115,24 @@ const NewJob = (props) => {
   }
 
   const submitJob = () => {
-    console.log(props.props.selection.get('ip'))
-    axios.post(
-      'http://' + props.props.selection.get('ip') + ':' + props.props.selection.get('port'),
-      {
-        _id: uuidv4(),
-        path: path.normalize(props.props.selection.get('path')),
-        includeTag: props.props.selection.get('includeTag'),
-        excludeTag: props.props.selection.get('excludeTag'),
-        preprocessing: props.props.preprocessing.get(props.props.selection.get('preprocessing')),
-        detection: props.props.detection.get(props.props.selection.get('detection')),
-        export: props.props.export.get(props.props.selection.get('export')),
-      }
-    ).then(function (response) {
-      addToast('Success', 'Job succesfully submitted to backend.');
-    })
-    .catch(function (error) {
-      addToast('Error', 'Job could not be sent to backend.');
-    })
+    let ip =  props.props.selection.get('ip')
+    let port = props.props.selection.get('port')
+    let gpu = deviceSelect
+
+    console.log(ip, port)
+
+    let req = {
+      _id: uuidv4(),
+      path: path.normalize(props.props.selection.get('path')),
+      includeTag: props.props.selection.get('includeTag'),
+      excludeTag: props.props.selection.get('excludeTag'),
+      preprocessing: props.props.preprocessing.get(props.props.selection.get('preprocessing')),
+      detection: props.props.detection.get(props.props.selection.get('detection')),
+      export: props.props.export.get(props.props.selection.get('export')),
+    }
+
+    ipcRenderer.send('start-backends', ip, port, req, gpu)
+    addToast('Starting Backend!', '1-2 console windows should appear soon!');
   };
 
   return (
@@ -211,6 +216,18 @@ const NewJob = (props) => {
                       {props.props.export.get(key).name}
                     </option>
                   )})}
+              </CSelect>
+            </CFormGroup>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
+            <CFormGroup>
+              <CLabel>Run local detection backend (if applicable) on GPU or CPU?</CLabel>
+              <CSelect value={deviceSelect} onChange={(event) => handleGPUSelection(event.currentTarget.value)} custom name='select' id='selectDevice'>
+                <option value={'cpu'} name={'CPU'}>
+                  {'CPU'}
+                </option>
+                <option value={'gpu'} name={'GPU'}>
+                  {'GPU'}
+                </option>
               </CSelect>
             </CFormGroup>
             <CFormGroup><CLabel></CLabel></CFormGroup>

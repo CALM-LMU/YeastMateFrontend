@@ -16,9 +16,18 @@ const upath = require('upath');
 
 const {shell} = require('electron');
 const spawn = require("child_process").spawn;
-const { exec } = require("child_process");
+const exec = require('child_process').exec;
+
+const fs = require('fs'); 
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
+
+axiosRetry(axios, { retries: 100 });
 
 let mainWindow = null;
+
+let ioBackendRunning = false;
+let decBackendRunning = false;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -77,8 +86,85 @@ ipcMain.on('start-napari', (event, path, scoreThresholds) => {
       "/c", 
       upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation.exe`), 
       path,
-      scoreThresholds
+      scoreThresho
   ]);
+  }
+})
+
+ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
+  if (ip === '127.0.0.1' || ip === 'localhost') {
+    if (port === 'automatic') {
+      portscanner.findAPortNotInUse(11002, 11201, '127.0.0.1', function(error, freePort) {
+        port = freePort
+      })
+    }
+  
+    if (os.platform() === 'win32') {
+      fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`), function(err, stat) {
+        if (err == null) {
+          if (ioBackendRunning === false) {
+            let iospawn = exec("start /wait " + 
+            upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`) + ' ' +
+              ip.toString() + ' ' + 
+              port.toString()
+            );
+  
+            ioBackendRunning = true;
+
+            axios.post(
+              'http://' + ip + ':' + port, req
+            ).then(function (response) {
+              console.log('big success!');
+            })
+            .catch(function (error) {
+              console.log('Error when sending cached request');
+            })
+  
+            iospawn.on('exit', (code, signal) => {
+              ioBackendRunning = false;
+            })
+          }
+        }
+        else{
+          axios.post(
+            'http://' + ip + ':' + port, req
+          ).then(function (response) {
+            console.log('big success!');
+          })
+          .catch(function (error) {
+            console.log('Error when sending cached request');
+          })
+        }
+      })
+      
+      if (decBackendRunning === false) {
+        fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector.exe`), function(err, stat) {
+          if (err == null) {
+            let decspawn = exec("start /wait " + 
+              upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector.exe`) + ' ' +
+              req.port.toString() + ' ' +
+              gpu
+            );
+  
+            ioBackendRunning = true;
+  
+            decspawn.on('exit', (code, signal) => {
+              decBackendRunning = false;
+            })
+          }
+        })
+      }  
+    }
+  }
+  else {
+    axios.post(
+      'http://' + ip + ':' + port, req
+    ).then(function (response) {
+      console.log('big success!');
+    })
+    .catch(function (error) {
+      console.log('Error when sending cached request');
+    })
   }
 })
 
@@ -109,19 +195,16 @@ app.on('ready', async () => {
 
   mainWindow.webContents.on('did-finish-load', () => {
   	if (os.platform() === 'linux') {
-			let op = spawn('gnome-terminal', ['-e', upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`)]);
+			let op = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateIO']);
 			op.on ('error', (err) => { console.log (err); });
-      let det = spawn('gnome-terminal', ['-e', upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`)]);
+      let det = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateDetector']);
 			det.on ('error', (err) => { console.log (err); });
 		}
 		if (os.platform() === 'darwin') {
 		  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`))
       shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`))
 		}
-		if (os.platform() === 'win32') {
-		  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`))
-      shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector.exe`))
-		}
+		
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }

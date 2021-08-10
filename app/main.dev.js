@@ -18,6 +18,8 @@ const {shell} = require('electron');
 const spawn = require("child_process").spawn;
 const exec = require('child_process').exec;
 
+var portscanner = require('portscanner');
+
 const fs = require('fs'); 
 import axios from 'axios';
 import axiosRetry from 'axios-retry';

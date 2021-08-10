@@ -200,7 +200,7 @@ const PreprocessingSettingsForm = (props) => {
             </CFormGroup>
             <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup>
-              <CLabel>Preprocessing will convert nd2 or tif files into detection-compatible tif files.</CLabel>
+              <CLabel>Preprocessing can convert Bioformats-compatible image files into detection-compatible .tif files.</CLabel>
             </CFormGroup>
             <CFormGroup>
               <CLabel>It can also perform additional alignment of different image channels if they were acquired with multiple microscope cameras.</CLabel>

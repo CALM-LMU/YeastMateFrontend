@@ -73,7 +73,9 @@ ipcMain.on('start-napari', (event, path, scoreThresholds) => {
   if (os.platform() === 'linux') {
 		let an = spawn('gnome-terminal', [
 		'-e',
-		'/home/bunk/BioElectron/python/YeastMate/YeastMateAnnotation ' + path + ' ' + scoreThresholds
+		upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`), 
+    path, 
+    scoreThresholds
 		]);
     an.on ('error', (err) => { console.log (err); });
   }
@@ -88,7 +90,7 @@ ipcMain.on('start-napari', (event, path, scoreThresholds) => {
       "/c", 
       upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation.exe`), 
       path,
-      scoreThresho
+      scoreThresholds
   ]);
   }
 })
@@ -100,13 +102,14 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
         port = freePort
       })
     }
-  
+    
+    // start windows backends
     if (os.platform() === 'win32') {
       fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`), function(err, stat) {
         if (err == null) {
           if (ioBackendRunning === false) {
             let iospawn = exec("start /wait " + 
-            upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`) + ' ' +
+            '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO.exe`) + '"' + ' ' +
               ip.toString() + ' ' + 
               port.toString()
             );
@@ -157,6 +160,127 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
         })
       }  
     }
+
+    // start linux backends
+    if (os.platform() === 'linux') {
+      fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`), function(err, stat) {
+        if (err == null) {
+          if (ioBackendRunning === false) {            
+            let iospawn = spawn('gnome-terminal', [
+              '-e',
+              upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`),
+              ip,
+              port
+              ]);
+              an.on ('error', (err) => { console.log (err); });
+  
+            ioBackendRunning = true;
+
+            axios.post(
+              'http://' + ip + ':' + port, req
+            ).then(function (response) {
+              console.log('big success!');
+            })
+            .catch(function (error) {
+              console.log('Error when sending cached request');
+            })
+  
+            iospawn.on('exit', (code, signal) => {
+              ioBackendRunning = false;
+            })
+          }
+        }
+        else{
+          axios.post(
+            'http://' + ip + ':' + port, req
+          ).then(function (response) {
+            console.log('big success!');
+          })
+          .catch(function (error) {
+            console.log('Error when sending cached request');
+          })
+        }
+      })
+      
+      if (decBackendRunning === false) {
+        fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`), function(err, stat) {
+          if (err == null) {
+            let decspawn = spawn('gnome-terminal', [
+              '-e',
+              upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`),
+              req.port,
+              gpu
+              ]);
+              an.on ('error', (err) => { console.log (err); });
+  
+            ioBackendRunning = true;
+  
+            decspawn.on('exit', (code, signal) => {
+              decBackendRunning = false;
+            })
+          }
+        })
+      }  
+    }
+
+    // start osx backends
+    if (os.platform() === 'darwin') {
+      fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`), function(err, stat) {
+        if (err == null) {
+          if (ioBackendRunning === false) {
+            let iospawn = exec("start /wait " + 
+            '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`) + '"' + ' ' +
+              ip.toString() + ' ' + 
+              port.toString()
+            );
+  
+            ioBackendRunning = true;
+
+            axios.post(
+              'http://' + ip + ':' + port, req
+            ).then(function (response) {
+              console.log('big success!');
+            })
+            .catch(function (error) {
+              console.log('Error when sending cached request');
+            })
+  
+            iospawn.on('exit', (code, signal) => {
+              ioBackendRunning = false;
+            })
+          }
+        }
+        else{
+          axios.post(
+            'http://' + ip + ':' + port, req
+          ).then(function (response) {
+            console.log('big success!');
+          })
+          .catch(function (error) {
+            console.log('Error when sending cached request');
+          })
+        }
+      })
+      
+      if (decBackendRunning === false) {
+        fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`), function(err, stat) {
+          if (err == null) {
+            let decspawn = exec("start /wait " + 
+              upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`) + ' ' +
+              req.port.toString() + ' ' +
+              gpu
+            );
+  
+            ioBackendRunning = true;
+  
+            decspawn.on('exit', (code, signal) => {
+              decBackendRunning = false;
+            })
+          }
+        })
+      }  
+    }
+
   }
   else {
     axios.post(

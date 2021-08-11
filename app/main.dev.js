@@ -98,6 +98,8 @@ ipcMain.on('start-napari', (event, path, scoreThresholds) => {
 ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
   if (ip === '127.0.0.1' || ip === 'localhost') {
     var newport = 0
+    var decPort = 11003
+
     if (port === 'automatic') {
       portscanner.findAPortNotInUse(11002, 11201, '127.0.0.1', function(error, freePort) {
         newport = freePort
@@ -107,11 +109,13 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
       newport = port
     }
 
-  if (req.detection.ip.split('')[0] !== '127.0.0.1' || req.detection.ip.split('')[0] !== 'localhost') {
+  if (req.detection.ip.split(':')[0] !== '127.0.0.1' && req.detection.ip.split(':')[0] !== 'localhost') {
     decBackendRunning = true
   }
   else {
-    var decPort = req.detection.ip.split('')[0][1]
+    portscanner.findAPortNotInUse(newport+1, newport+100, '127.0.0.1', function(error, freePort) {
+      decPort = freePort
+    })
   }
     
     // start windows backends

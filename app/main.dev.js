@@ -106,6 +106,13 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
     else {
       newport = port
     }
+
+  if (req.detection.ip.split('')[0] !== '127.0.0.1' || req.detection.ip.split('')[0] !== 'localhost') {
+    decBackendRunning = true
+  }
+  else {
+    var decPort = req.detection.ip.split('')[0][1]
+  }
     
     // start windows backends
     if (os.platform() === 'win32') {
@@ -147,7 +154,7 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
         fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer.exe`), function(err, stat) {
           if (err == null) {
             let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer.exe`);
-            let decspawn = exec( `start /wait "" "${exepath}" ${req.detection.port.toString()} ${gpu}` );
+            let decspawn = exec( `start /wait "" "${exepath}" ${decPort} ${gpu}` );
   
             ioBackendRunning = true;
   
@@ -167,8 +174,7 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
             let iospawn = spawn('gnome-terminal', [
               '-e',
               '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend`) + '"',
-              ip,
-              port
+              newport
               ]);
               an.on ('error', (err) => { console.log (err); });
   
@@ -206,7 +212,7 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
             let decspawn = spawn('gnome-terminal', [
               '-e',
               '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer`) + '"',
-              req.port,
+              decPort,
               gpu
               ]);
               an.on ('error', (err) => { console.log (err); });
@@ -228,8 +234,7 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
           if (ioBackendRunning === false) {
             let iospawn = exec("start /wait " + 
             '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend`) + '"' + ' ' +
-              ip.toString() + ' ' + 
-              port.toString()
+            newport.toString()
             );
   
             ioBackendRunning = true;
@@ -265,7 +270,7 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
           if (err == null) {
             let decspawn = exec("start /wait " + 
             '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer` + '"' + ' ' +
-              req.port.toString() + ' ' +
+              decPort + ' ' +
               gpu
             ));
   

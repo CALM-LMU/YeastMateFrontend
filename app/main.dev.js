@@ -180,7 +180,7 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
               '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend`) + '"',
               newport
               ]);
-              an.on ('error', (err) => { console.log (err); });
+              iospawn.on ('error', (err) => { console.log (err); });
   
             ioBackendRunning = true;
 
@@ -219,7 +219,7 @@ ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
               decPort,
               gpu
               ]);
-              an.on ('error', (err) => { console.log (err); });
+              decspawn.on ('error', (err) => { console.log (err); });
   
             ioBackendRunning = true;
   
@@ -326,18 +326,7 @@ app.on('ready', async () => {
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 
-  mainWindow.webContents.on('did-finish-load', () => {
-  	if (os.platform() === 'linux') {
-			let op = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateIO']);
-			op.on ('error', (err) => { console.log (err); });
-      let det = spawn('gnome-terminal', ['-e','/home/bunk/BioElectron/python/YeastMate/YeastMateDetector']);
-			det.on ('error', (err) => { console.log (err); });
-		}
-		if (os.platform() === 'darwin') {
-		  shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateIO`))
-      shell.openItem(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetector`))
-		}
-		
+  mainWindow.webContents.on('did-finish-load', () => {	
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }

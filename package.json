@@ -97,7 +97,8 @@
     "nsis": {
       "differentialPackage": false,
       "allowToChangeInstallationDirectory": true,
-      "oneClick": false
+      "oneClick": false,
+      "allowElevation": true
     },
     "linux": {
       "target": [

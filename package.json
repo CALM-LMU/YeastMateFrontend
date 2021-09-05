@@ -1,7 +1,7 @@
 {
   "name": "yeastmate",
   "productName": "yeastmate",
-  "version": "0.10.0",
+  "version": "0.10.2",
   "description": "YeastMate Electron/React Interface using BioDetectron",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",

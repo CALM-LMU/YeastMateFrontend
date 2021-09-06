@@ -306,6 +306,7 @@
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
     "source-map-support": "^0.5.16",
+    "temp": "^0.9.4",
     "tiff.js": "^1.0.0",
     "typescript": "^3.9.5",
     "upath": "^1.2.0",

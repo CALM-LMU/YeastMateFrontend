@@ -3,9 +3,9 @@ import { HashRouter, Route, Switch } from 'react-router-dom';
 import './app.global.scss';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExclamation, faBan, faPlus, faUndo, faSync, faUpload, faArrowUp, faArrowDown, faWindowClose, faWindowRestore, faWindowMinimize } from '@fortawesome/free-solid-svg-icons'
+import { faCog, faExclamation, faBan, faPlus, faUndo, faSync, faUpload, faArrowUp, faArrowDown, faWindowClose, faWindowRestore, faWindowMinimize } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faExclamation, faBan, faPlus, faUndo, faSync, faUpload, faArrowUp, faArrowDown, faWindowClose, faWindowRestore, faWindowMinimize)
+library.add( faCog, faExclamation, faBan, faPlus, faUndo, faSync, faUpload, faArrowUp, faArrowDown, faWindowClose, faWindowRestore, faWindowMinimize)
 
 const loading = (
   <div className="pt-3 text-center">

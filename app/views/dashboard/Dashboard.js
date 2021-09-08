@@ -33,7 +33,7 @@ const getStatusBadge = (status)=>{
 const Dashboard = (props) => {
   const [jobList, setjobList] = React.useState([])
 
-  const get_jobs = async () => {
+  const getJobs = async () => {
     console.log(props.props.get('ip')  + ":" + props.props.get('port'))
     try {
       const result = await axios(
@@ -46,10 +46,10 @@ const Dashboard = (props) => {
   };
 
   React.useEffect(() => { 
-    get_jobs();
+    getJobs();
 
     const interval = setInterval(() => {
-      get_jobs();
+      getJobs();
     }, 5000);
 
     return () => clearInterval(interval);

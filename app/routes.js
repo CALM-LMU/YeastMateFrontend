@@ -6,6 +6,7 @@ const Store = require('electron-store');
 const PreprocessingSettings = React.lazy(() => import('./views/settings/PreprocessingSettingsForm'));
 const DetectionSettings = React.lazy(() => import('./views/settings/DetectionSettingsForm'));
 const ExportSettings = React.lazy(() => import('./views/settings/ExportSettingsForm'));
+const BackendSettings = React.lazy(() => import('./views/settings/BackendSettingsForm'));
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'));
 const StartNewJob = React.lazy(() => import('./views/newjob/NewJob'));
 const Annotate = React.lazy(() => import('./views/annotate/Annotate'));
@@ -14,20 +15,12 @@ const store = new Store();
 
 var sidebarShow = observable(new Map())
 var presetSelection = observable(new Map())
-var annotationPresetList= observable(new Map())
 var preprocessingPresetList = observable(new Map())
 var detectPresetList = observable(new Map())
 var exportPresetList = observable(new Map())
+var backendPresetList = observable(new Map())
 
 sidebarShow.set('show', 'responsive')
-
-annotationPresetList.set('821198b7-83e5-4ccb-9579-48f5f7849221', {
-  name: 'Default',
-  path: '',
-  differentThresholds: false,
-  matingThreshold: 50,
-  buddingThreshold: 50
-})
 
 preprocessingPresetList.set('1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', {
   name: 'Default',
@@ -51,19 +44,16 @@ detectPresetList.set('a809ff23-4235-484f-86f2-e5d87da8333d', {
     pixelSize: 110,
     referencePixelSize: 110,
     advancedSettings: false,
-    superAdvancedSettings: false,
-    lowerQuantile: 1,
-    upperQuantile:99,
+    lowerQuantile: 1.5,
+    upperQuantile: 98.5,
     singleThreshold: 90,
     matingThreshold: 75,
     buddingThreshold: 75,
     frameSelection: 'all',
-    ip: '127.0.0.1:5000'
  })
 
 exportPresetList.set('1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f', {
   name: 'Default',
-  crop: false,
   classes: [
     {'Class ID':0,'Tag':'Single cells','Crop':'False'},
     {'Class ID':1,'Tag':'Mating zygotes','Crop':'True'},
@@ -74,14 +64,6 @@ exportPresetList.set('1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f', {
   boxScaleSwitch: false,
   boxScale: 1
 })
-
-if (typeof store.get('annotation') !== 'undefined') {
-  for (let [key, value] of Object.entries(store.get('annotation'))) {
-    if (key !== '821198b7-83e5-4ccb-9579-48f5f7849221') {
-      preprocessingPresetList.set(key, value)
-    }
-  }
-}
 
 if (typeof store.get('preprocessing') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('preprocessing'))) {
@@ -107,6 +89,22 @@ if (typeof store.get('export') !== 'undefined') {
   }
 }
 
+if (typeof store.get('backend') !== 'undefined') {
+  for (let [key, value] of Object.entries(store.get('export'))) {
+    backendPresetList.set(key, value)
+  }
+}
+  backendPresetList.set('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea', {
+    name: 'Default',
+    localIO: true,
+    ioIP: '127.0.0.1',
+    ioPort: 11002,
+    localDetection: true,
+    detectionIP: '127.0.0.1',
+    detectionPort:11003,
+    detectionDevice: 'gpu',
+  })
+
 if (typeof store.get('selection') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('selection'))) {
     presetSelection.set(key, value)
@@ -121,20 +119,17 @@ else {
   presetSelection.set('export', null)
 }
 
-presetSelection.set('external', false)
-presetSelection.set('ip', '127.0.0.1')
-presetSelection.set('port', 'automatic')
-
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard , data: presetSelection },
-  { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
-  { path: '/annotate', name: 'Annotate your data', component: Annotate, data: annotationPresetList },
+  { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, backend: backendPresetList, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
+  { path: '/annotate', name: 'Annotate your data', component: Annotate },
   { path: '/preprocessing', name: 'Preprocessing Settings', component: PreprocessingSettings, data: preprocessingPresetList },
   { path: '/detection', name: 'Detection Settings', component: DetectionSettings, data: detectPresetList },
   { path: '/export', name: 'Export Settings', component: ExportSettings, data: exportPresetList },
+  { path: '/backend', name: 'Backend Settings', component: BackendSettings, data: backendPresetList },
 ];
 
-const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { port:presetSelection, selection: presetSelection, annotation: annotationPresetList, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
+const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { backend:backendPresetList, selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}
 
 export default prop;

@@ -3,8 +3,13 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { v4 as uuidv4 } from 'uuid';
 const path = require('path');
+
+var electron = require('electron')
 const { dialog } = require('electron').remote;
 const { ipcRenderer } = require('electron')
+
+import axios from 'axios';
+var portscanner = require('portscanner');
 
 import {
   CButton,
@@ -12,13 +17,12 @@ import {
   CCardBody,
   CCardFooter,
   CCardHeader,
-  CCol,
-  CCollapse,
   CForm,
   CFormGroup,
   CInput,
   CInputGroupAppend,
   CLabel,
+  CLink,
   CSelect,
   CSwitch,
   CToast,
@@ -29,11 +33,10 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const NewJob = (props) => {
+
   const [toasts, setToasts] = React.useState([{}])
-  const [tempIP, setTempIP] = React.useState(props.props.selection.get('ip'));
-  const [tempPort, setTempPort] = React.useState(props.props.selection.get('port'));
-  const [deviceSelect, setDeviceSelect] = React.useState('cpu');
-  const [externalCollapse, setExternalCollapse] = React.useState(props.props.selection.get('external'));
+  const [ioBackendRunning, setIOBackendRunning] = React.useState(electron.remote.getGlobal('ioBackendRunning'))
+  const [decBackendRunning, setDecBackendRunning] = React.useState(electron.remote.getGlobal('decBackendRunning'))
 
   const handleAddPathClick = () => {
     var selectedPath = dialog.showOpenDialog({
@@ -60,6 +63,26 @@ const NewJob = (props) => {
     ])
   }
 
+  const getBackendStatus = async () => {
+    try {
+      const result = await axios(
+        props.props.detection.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea') + ":" + props.props.get('port'),
+      );
+      setIOBackendRunning(true);
+    } catch (error) {
+      setIOBackendRunning(false);
+    }
+
+    try {
+      const result = await axios(
+        props.props.get('ip') + ":" + props.props.get('port'),
+      );
+      setDecBackendRunning(true);
+    } catch (error) {
+      setDecBackendRunning(false);
+    }
+  };
+
   const setPathInput = (value) => {
     props.props.selection.set('path', value)
   }
@@ -84,43 +107,41 @@ const NewJob = (props) => {
     props.props.selection.set('export', value)
   }
 
-  const handleGPUSelection = (value) => {
-    setDeviceSelect(value)
-  }
-
-  const switchExternal = () => {
-    props.props.selection.set('external', !props.props.selection.get('external'))
-
-    if (props.props.selection.get('external') === false) {
-      setTempIP(props.props.selection.get('ip'))
-      setTempPort(props.props.selection.get('ip'))
-
-      props.props.selection.set('ip', '127.0.0.1')
-      props.props.selection.set('port','automatic')
-    }
-    else {
-      props.props.selection.set('ip', tempIP)
-      props.props.selection.set('port', tempPort)
+  const startBackends = () => {
+    portscanner.findAPortNotInUse(11002, 11201, '127.0.0.1', function(error, freePort) {
+      let newport = freePort
+    })
+    if (
+      props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === false &&
+      props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localDetection === false
+    ) {
+      addToast('External backends set.', 'Start external backends manually.');
+      return
     }
 
-    setExternalCollapse(props.props.selection.get('external'))
-  }
-
-  const setIP = (value) => {
-    props.props.selection.set('ip', value)
-  }
-  
-  const setPort = (value) => {
-    props.props.selection.set('port', value)
-  }
+    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {
+      if (ioBackendRunning === true) {
+        addToast('Local IO Backend running.', 'Local IO Backend is running.');
+      }
+      else {
+        ipcRenderer.send('start-io-backend', ip, port, gpu)
+        addToast('Starting local IO Backend.', 'A console windows should appear soon!');
+      }
+    }
+    
+    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localDetection === true) {
+      if (decBackendRunning === true) {
+        addToast('Local Detection Backend running.', 'Local Detection Backend is running.');
+      }
+      else {
+        ipcRenderer.send('start-detection-backend', ip, port, gpu)
+        addToast('Starting local Detection Backend.', 'A console windows should appear soon!');
+      }
+    }
+  };
 
   const submitJob = () => {
-    let ip =  props.props.selection.get('ip')
-    let port = props.props.selection.get('port')
-    let gpu = deviceSelect
-
-    console.log(ip, port)
-
+    
     let req = {
       _id: uuidv4(),
       path: path.normalize(props.props.selection.get('path')),
@@ -131,12 +152,53 @@ const NewJob = (props) => {
       export: props.props.export.get(props.props.selection.get('export')),
     }
 
-    ipcRenderer.send('start-backends', ip, port, req, gpu)
+    axios.post(
+      'http://' + ip + ':' + port, req
+    ).then(function (response) {
+      console.log('big success!');
+    })
+    .catch(function (error) {
+      console.log('Error when sending cached request');
+    })
+
     addToast('Starting Backend!', '1-2 console windows should appear soon!');
   };
 
+  React.useEffect(() => { 
+    getBackendStatus();
+
+    const interval = setInterval(() => {
+      getBackendStatus();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
+      <CCard>
+        <CCardHeader>
+          Backend Status:
+        </CCardHeader>
+        <CCardBody>
+          <CForm>
+            <CFormGroup className="d-flex justify-content-between">
+              <CLabel>IO Backend</CLabel>
+              <CSwitch className={'mx-1'} color={'success'} disabled={true} checked={ioBackendRunning}  id="ioYes"/>
+            </CFormGroup>
+            <CFormGroup className="d-flex justify-content-between">
+              <CLabel>Detection Backend</CLabel>
+              <CSwitch className={'mx-1'} color={'success'} disabled={true} checked={decBackendRunning}  id="decYes"/>
+            </CFormGroup>
+          </CForm>
+        </CCardBody>
+        <CCardFooter>
+          <CFormGroup className="d-flex justify-content-between">
+            <CButton size='sm' to="/backend"  color='primary'><FontAwesomeIcon icon='cog' /> Setup backends</CButton>
+            <CButton size='sm' onClick={startBackends} color='success'><FontAwesomeIcon icon='submit' /> Start backends</CButton>
+          </CFormGroup>
+        </CCardFooter>
+      </CCard>
       <CCard>
         <CCardHeader>
           Start a new job!
@@ -151,15 +213,15 @@ const NewJob = (props) => {
               </CInputGroupAppend>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Include only files with following tag:</CLabel>
+              <CLabel>Include only files containing:</CLabel>
               <CInput id='includeTagInput' onChange={(event) => setIncludeTagInput(event.currentTarget.value)} value={props.props.selection.get('includeTag')}></CInput>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Exclude files with following tag:</CLabel>
+              <CLabel>Exclude files containing:</CLabel>
               <CInput id='excludeTagInput' onChange={(event) => setExcludeTagInput(event.currentTarget.value)} value={props.props.selection.get('excludeTag')}></CInput>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Select your preset for detecting cells.</CLabel>
+              <CLabel>Select your preset for <CLink to="/detection"> detection settings.</CLink></CLabel>
               <CSelect value={props.props.selection.get('detection')} onChange={(event) => handleDetectionSelection(event.currentTarget.value)} custom name='select' id='selectDetection'>
                 <option
                   value={null}
@@ -179,7 +241,7 @@ const NewJob = (props) => {
               </CSelect>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Select your preprocessing preset if you want to align or load nd2 files.</CLabel>
+            <CLabel>Select your preset for <CLink to="/preprocessing"> preprocessing settings.</CLink></CLabel>
               <CSelect value={props.props.selection.get('preprocessing')} onChange={(event) => handlePreprocessingSelection(event.currentTarget.value)} custom name='select' id='selectPreprocessing'>
                 <option
                   value={null}
@@ -199,7 +261,7 @@ const NewJob = (props) => {
               </CSelect>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Select your preset for exporting detections.</CLabel>
+              <CLabel>Select your preset for <CLink to="/export"> export settings.</CLink></CLabel>
               <CSelect value={props.props.selection.get('export')} onChange={(event) => handleExportSelection(event.currentTarget.value)} custom name='select' id='selectExport'>
                 <option
                   value={null}
@@ -218,51 +280,10 @@ const NewJob = (props) => {
                   )})}
               </CSelect>
             </CFormGroup>
-            <CFormGroup><CLabel></CLabel></CFormGroup>
-            <CFormGroup>
-              <CLabel>Run local detection backend (if applicable) on GPU or CPU?</CLabel>
-              <CSelect value={deviceSelect} onChange={(event) => handleGPUSelection(event.currentTarget.value)} custom name='select' id='selectDevice'>
-                <option value={'cpu'} name={'CPU'}>
-                  {'CPU'}
-                </option>
-                <option value={'gpu'} name={'GPU'}>
-                  {'GPU'}
-                </option>
-              </CSelect>
-            </CFormGroup>
-            <CFormGroup><CLabel></CLabel></CFormGroup>
-            <CFormGroup row>
-              <CCol md='8'>
-                  <CLabel>Do you run the python backend on an external system?</CLabel>
-              </CCol>
-              <CCol md='3'>
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchExternal} checked={props.props.selection.get('external')} id='stackYes'/>
-                </CFormGroup>
-              </CCol>
-            </CFormGroup>
-            <CCollapse show={externalCollapse}>
-              <CFormGroup row>
-                  <CCol md='8'>
-                    <CLabel>Set IP adress of external server.</CLabel>
-                  </CCol>
-                  <CCol md='2'>
-                    <CInput defaultValue={props.props.selection.get('ip')} onChange={(event) => setIP(event.currentTarget.value)}/>
-                  </CCol>
-                </CFormGroup>
-                <CFormGroup row>
-                  <CCol md='8'>
-                    <CLabel>Set port of external server.</CLabel>
-                  </CCol>
-                  <CCol md='2'>
-                    <CInput defaultValue={props.props.selection.get('port')} onChange={(event) => setPort(event.currentTarget.value)}/>
-                  </CCol>
-                </CFormGroup>
-              </CCollapse>
           </CForm>
         </CCardBody>
         <CCardFooter>
-          <CButton type='submit' size='sm' onClick={submitJob} color='primary'><FontAwesomeIcon icon='upload' /> Submit</CButton>
+          <CButton type='submit' size='sm' onClick={submitJob} color='success'><FontAwesomeIcon icon='upload' /> Submit</CButton>
         </CCardFooter>
       </CCard>
       {Object.keys(toasters).map((toasterKey) => (

@@ -9,13 +9,13 @@ export default [
     _tag: 'CSidebarNavItem',
     name: 'Dashboard',
     to: '/dashboard',
-    icon: 'cil-speedometer',
+    icon: 'cil-align-left',
   },
   {
     _tag: 'CSidebarNavItem',
     name: 'Visualize / Annotate',
     to: '/annotate',
-    icon: 'cil-speedometer',
+    icon: 'cil-layers',
   },
   {
     _tag: 'CSidebarNavTitle',
@@ -23,21 +23,27 @@ export default [
   },
   {
     _tag: 'CSidebarNavItem',
+    name: 'Backends',
+    to: '/backend',
+    icon: 'cil-settings',
+  },
+  {
+    _tag: 'CSidebarNavItem',
     name: 'Detection',
     to: '/detection',
-    icon: 'cil-align-left',
+    icon: 'cil-settings',
   },
   {
     _tag: 'CSidebarNavItem',
     name: 'Preprocessing',
     to: '/preprocessing',
-    icon: 'cil-align-left',
+    icon: 'cil-settings',
   },
   {
     _tag: 'CSidebarNavItem',
     name: 'Export',
     to: '/export',
-    icon: 'cil-align-left',
+    icon: 'cil-settings',
   },
   {
     _tag: 'CSidebarNavDivider',

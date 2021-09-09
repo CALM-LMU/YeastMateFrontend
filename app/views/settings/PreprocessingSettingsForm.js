@@ -205,15 +205,9 @@ const PreprocessingSettingsForm = (props) => {
             <CFormGroup>
               <CLabel>It can also perform additional alignment of different image channels if they were acquired with multiple microscope cameras.</CLabel>
             </CFormGroup>
-            <CFormGroup row>
-              <CCol md="3">
-                  <CLabel>Perform alignment?</CLabel>
-              </CCol>
-              <CCol md="9">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchAlignment} checked={props.props.get(selectPresetValue).alignment} id="alignmentYes"/>
-                </CFormGroup>
-              </CCol>
+            <CFormGroup className="d-flex justify-content-between">
+              <CLabel>Perform alignment?</CLabel>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchAlignment} checked={props.props.get(selectPresetValue).alignment} id="alignmentYes"/>
             </CFormGroup>
             <CCollapse show={alignCollapse}>
               <CFormGroup>
@@ -276,17 +270,11 @@ const PreprocessingSettingsForm = (props) => {
                 <FontAwesomeIcon icon="ban"/>   Remove Channel
               </CButton>
             </CFormGroup>
-            <CFormGroup><CLabel></CLabel></CFormGroup>
             </CCollapse>
-            <CFormGroup row>
-              <CCol md="3">
-                  <CLabel>Split videos into single frames?</CLabel>
-              </CCol>
-              <CCol md="9">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
-                </CFormGroup>
-              </CCol>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
+            <CFormGroup className="d-flex justify-content-between">
+              <CLabel>Split videos into single frames?</CLabel>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchVideoSplit} checked={props.props.get(selectPresetValue).videoSplit} id="videoSplitYes"/>
             </CFormGroup>
           </CForm>
           <CModal 

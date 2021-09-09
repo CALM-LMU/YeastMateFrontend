@@ -38,7 +38,6 @@ const ExportSettingsForm = (props) => {
   const [modalAdd, setModalAdd] = React.useState(false)
   const [scaleCollapse, setScaleCollapse] = React.useState(props.props.get(selectPresetValue).boxScaleSwitch);
   const [boxCollapse, setBoxCollapse] = React.useState(props.props.get(selectPresetValue).boxExpansion);
-  const [cropCollapse, setCropCollapse] = React.useState(props.props.get(selectPresetValue).crop)
   const [modalRemove, setModalRemove] = React.useState(false)
   const [NameInput, setNameInput] = React.useState("")
 
@@ -79,11 +78,6 @@ const ExportSettingsForm = (props) => {
       case "False": return 'danger'
       default: return 'secondary'
     }
-  }
-  
-  const switchCrop = () => {
-    props.props.get(selectPresetValue).crop = !props.props.get(selectPresetValue).crop
-    setCropCollapse(props.props.get(selectPresetValue).crop)
   }
 
   const switchBox = () => {
@@ -147,7 +141,6 @@ const ExportSettingsForm = (props) => {
     const id = uuidv4()
     props.props.set(id, {
       name: NameInput,
-      crop: props.props.get(selectPresetValue).crop,
       classes: props.props.get(selectPresetValue).classes,
       boxSize: props.props.get(selectPresetValue).boxSize,
       boxExpansion: props.props.get(selectPresetValue).boxExpansion,
@@ -193,96 +186,84 @@ const ExportSettingsForm = (props) => {
             <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup row>
               <CCol md="9">
-                  <CLabel>Save crops of detected objects?</CLabel>
+                  <CLabel>Generate crops of fixed size?</CLabel>
               </CCol>
               <CCol md="3">
                 <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchCrop} checked={props.props.get(selectPresetValue).crop} id="cropYes"/>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchBox} checked={props.props.get(selectPresetValue).boxExpansion} id="boxYes"/>
                 </CFormGroup>
               </CCol>
             </CFormGroup>
-            <CCollapse show={cropCollapse}>
+            <CCollapse show={boxCollapse}> 
               <CFormGroup row>
-                <CCol md="9">
-                    <CLabel>Set static size for image crops?</CLabel>
+                <CCol md="7">
+                  <CLabel>Size of cropped boxes around detected objects (in pixel).</CLabel>
                 </CCol>
                 <CCol md="3">
-                  <CFormGroup>
-                    <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchBox} checked={props.props.get(selectPresetValue).boxExpansion} id="boxYes"/>
-                  </CFormGroup>
+                  <CInput type='number' min={10} step={5} defaultValue={props.props.get(selectPresetValue).boxSize} onChange={(event) => setBoxSize(event.currentTarget.value)}/>
                 </CCol>
               </CFormGroup>
-              <CCollapse show={boxCollapse}> 
-                <CFormGroup row>
-                  <CCol md="7">
-                    <CLabel>Size of cropped boxes around detected objects.</CLabel>
-                  </CCol>
-                  <CCol md="3">
-                    <CInput type='number' min={10} step={5} defaultValue={props.props.get(selectPresetValue).boxSize} onChange={(event) => setBoxSize(event.currentTarget.value)}/>
-                  </CCol>
+            </CCollapse>
+            <CFormGroup row>
+              <CCol md="9">
+                  <CLabel>Scale bounding boxes of detected cells?</CLabel>
+              </CCol>
+              <CCol md="3">
+                <CFormGroup>
+                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchScale} checked={props.props.get(selectPresetValue).boxScaleSwitch} id="scaleYes"/>
                 </CFormGroup>
-              </CCollapse>
+              </CCol>
+            </CFormGroup>
+            <CCollapse show={scaleCollapse}> 
               <CFormGroup row>
-                <CCol md="9">
-                    <CLabel>Scale boxes by factor?</CLabel>
+                <CCol md="7">
+                  <CLabel>Factor to scale boxes by.</CLabel>
                 </CCol>
                 <CCol md="3">
-                  <CFormGroup>
-                    <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchScale} checked={props.props.get(selectPresetValue).boxScaleSwitch} id="scaleYes"/>
-                  </CFormGroup>
+                  <CInput type='number' min={0} step={0.05} defaultValue={props.props.get(selectPresetValue).boxScale} onChange={(event) => setBoxScale(vent.currentTarget.value)}/>
                 </CCol>
               </CFormGroup>
-              <CCollapse show={scaleCollapse}> 
-                <CFormGroup row>
-                  <CCol md="7">
-                    <CLabel>Scale for boxes.</CLabel>
-                  </CCol>
-                  <CCol md="3">
-                    <CInput type='number' min={0} step={5} defaultValue={props.props.get(selectPresetValue).boxScale} onChange={(event) => setBoxScale(vent.currentTarget.value)}/>
-                  </CCol>
-                </CFormGroup>
-              </CCollapse>
-              <CFormGroup>
-                <CDataTable
-                  items={props.props.get(selectPresetValue).classes}
-                  fields={classFields}
-                  itemsPerPage={100}
-                  hover
-                  scopedSlots = {{
-                    'Tag':
-                      (item, index)=>(
-                        <td>
-                          <CInput value={item.Tag} onChange={(event) => setTag(index, event.currentTarget.value)}/>
-                        </td>
-                      ),
-                    'Save crops':
-                      (item)=>(
-                        <td>
-                          <CBadge color={getCropBadge(item.Crop)}>
-                            {item.Crop}
-                          </CBadge>
-                        </td>
-                      ),
-                      'Toggle':
-                        (item, index)=>{
-                          return (
-                            <CButton onClick={()=>{toggleCropStatus(index)}} color="dark" size="md" variant="outline">
-                              <FontAwesomeIcon icon="sync"/>   Crop
-                            </CButton>
-                        )
-                      }
+            </CCollapse>
+            <CFormGroup>
+              <CDataTable
+                items={props.props.get(selectPresetValue).classes}
+                fields={classFields}
+                itemsPerPage={100}
+                hover
+                scopedSlots = {{
+                  'Tag':
+                    (item, index)=>(
+                      <td>
+                        <CInput value={item.Tag} onChange={(event) => setTag(index, event.currentTarget.value)}/>
+                      </td>
+                    ),
+                  'Save crops':
+                    (item)=>(
+                      <td>
+                        <CBadge color={getCropBadge(item.Crop)}>
+                          {item.Crop}
+                        </CBadge>
+                      </td>
+                    ),
+                    'Toggle':
+                      (item, index)=>{
+                        return (
+                          <CButton onClick={()=>{toggleCropStatus(index)}} color="dark" size="md" variant="outline">
+                            <FontAwesomeIcon icon="sync"/>   Crop
+                          </CButton>
+                      )
                     }
                   }
-                />
-                <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
-                  <FontAwesomeIcon icon="plus"/>   Add Class
-                </CButton>
-                <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm">
-                  <FontAwesomeIcon icon="ban"/>   Remove last class
-                </CButton>
-              </CFormGroup>
-              <CFormGroup><CLabel></CLabel></CFormGroup>
-            </CCollapse>
+                }
+              />
+              <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
+                <FontAwesomeIcon icon="plus"/>   Add Class
+              </CButton>
+              <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm">
+                <FontAwesomeIcon icon="ban"/>   Remove last class
+              </CButton>
+            </CFormGroup>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
           </CForm>
           <CModal 
               show={modalAdd} 

@@ -14,22 +14,13 @@ import { app, BrowserWindow, Menu, ipcMain, dialog } from 'electron';
 const os = require('os');
 const upath = require('upath');
 
-const {shell} = require('electron');
 const spawn = require("child_process").spawn;
 const exec = require('child_process').exec;
 
-var portscanner = require('portscanner');
-
-const fs = require('fs'); 
-import axios from 'axios';
-import axiosRetry from 'axios-retry';
-
-axiosRetry(axios, { retries: 100 });
-
 let mainWindow = null;
 
-let ioBackendRunning = false;
-let decBackendRunning = false;
+global.ioBackendRunning = false;
+global.decBackendRunning = false;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -73,231 +64,72 @@ ipcMain.on('start-napari', (event, path, scoreThresholds) => {
   if (os.platform() === 'linux') {
 		let an = spawn('gnome-terminal', [
 		'-e',
-		upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`), 
-    path, 
-    scoreThresholds
+		upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation`), 
+    path
 		]);
-    an.on ('error', (err) => { console.log (err); });
   }
   if (os.platform() === 'darwin') {
-    let bat = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation`), [
-      path,
-      scoreThresholds
-  ]);
+    let an = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation`), [
+      path
+    ]);
   }
   if (os.platform() === 'win32') {
-    let bat = spawn("cmd.exe", [
+    let an = spawn("cmd.exe", [
       "/c", 
-      upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateAnnotation.exe`), 
-      path,
-      scoreThresholds
-  ]);
+      upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation.exe`), 
+      path
+    ]);
   }
 })
 
-ipcMain.on('start-backends', (event, ip, port, req, gpu) => {
-  if (ip === '127.0.0.1' || ip === 'localhost') {
-    var newport = 0
-    var decPort = 11003
-
-    if (port === 'automatic') {
-      portscanner.findAPortNotInUse(11002, 11201, '127.0.0.1', function(error, freePort) {
-        newport = freePort
-      })
-    }
-    else {
-      newport = port
-    }
-
-  if (req.detection.ip.split(':')[0] !== '127.0.0.1' && req.detection.ip.split(':')[0] !== 'localhost') {
-    decBackendRunning = true
-  }
-  else {
-    portscanner.findAPortNotInUse(newport+1, newport+100, '127.0.0.1', function(error, freePort) {
-      decPort = freePort
-    })
-  }
-    
-    // start windows backends
+ipcMain.on('start-io-backend', (event, port) => {
+    // start windows backend
     if (os.platform() === 'win32') {
-      fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend.exe`), function(err, stat) {
-        if (err == null) {
-          if (ioBackendRunning === false) {
-            let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend.exe`);
-            let iospawn = exec( `start /wait "" "${exepath}" ${newport.toString()}` );
-  
-            ioBackendRunning = true;
-
-            axios.post(
-              'http://' + ip + ':' + port, req
-            ).then(function (response) {
-              console.log('big success!');
-            })
-            .catch(function (error) {
-              console.log('Error when sending cached request');
-            })
-  
-            iospawn.on('exit', (code, signal) => {
-              ioBackendRunning = false;
-            })
-          }
-        }
-        else{
-          axios.post(
-            'http://' + ip + ':' + port, req
-          ).then(function (response) {
-            console.log('big success!');
-          })
-          .catch(function (error) {
-            console.log('Error when sending cached request');
-          })
-        }
-      })
-      
-      if (decBackendRunning === false) {
-        fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer.exe`), function(err, stat) {
-          if (err == null) {
-            let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer.exe`);
-            let decspawn = exec( `start /wait "" "${exepath}" ${decPort} ${gpu}` );
-  
-            ioBackendRunning = true;
-  
-            decspawn.on('exit', (code, signal) => {
-              decBackendRunning = false;
-            })
-          }
-        })
-      }  
+      let exepath = upath.toUnix(`C:/Users/david/Projects/BioElectron/python/YeastMate/hueyserver.exe`);
+      let iospawn = exec( `start /wait "" "${exepath}" --port ${newport.toString()}` );
     }
 
     // start linux backends
-    if (os.platform() === 'linux') {
-      fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend`), function(err, stat) {
-        if (err == null) {
-          if (ioBackendRunning === false) {            
-            let iospawn = spawn('gnome-terminal', [
-              '-e',
-              '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend`) + '"',
-              newport
-              ]);
-              iospawn.on ('error', (err) => { console.log (err); });
-  
-            ioBackendRunning = true;
-
-            axios.post(
-              'http://' + ip + ':' + port, req
-            ).then(function (response) {
-              console.log('big success!');
-            })
-            .catch(function (error) {
-              console.log('Error when sending cached request');
-            })
-  
-            iospawn.on('exit', (code, signal) => {
-              ioBackendRunning = false;
-            })
-          }
-        }
-        else{
-          axios.post(
-            'http://' + ip + ':' + port, req
-          ).then(function (response) {
-            console.log('big success!');
-          })
-          .catch(function (error) {
-            console.log('Error when sending cached request');
-          })
-        }
-      })
-      
-      if (decBackendRunning === false) {
-        fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer`), function(err, stat) {
-          if (err == null) {
-            let decspawn = spawn('gnome-terminal', [
-              '-e',
-              '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer`) + '"',
-              decPort,
-              gpu
-              ]);
-              decspawn.on ('error', (err) => { console.log (err); });
-  
-            ioBackendRunning = true;
-  
-            decspawn.on('exit', (code, signal) => {
-              decBackendRunning = false;
-            })
-          }
-        })
-      }  
+    if (os.platform() === 'linux') {     
+    
+      let iospawn = spawn('gnome-terminal', [
+        '-e',
+        '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`) + '"',
+        newport
+        ]);
     }
 
     // start osx backends
     if (os.platform() === 'darwin') {
-      fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend`), function(err, stat) {
-        if (err == null) {
-          if (ioBackendRunning === false) {
-            let iospawn = exec("start /wait " + 
-            '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateBackend`) + '"' + ' ' +
-            newport.toString()
-            );
-  
-            ioBackendRunning = true;
-
-            axios.post(
-              'http://' + ip + ':' + port, req
-            ).then(function (response) {
-              console.log('big success!');
-            })
-            .catch(function (error) {
-              console.log('Error when sending cached request');
-            })
-  
-            iospawn.on('exit', (code, signal) => {
-              ioBackendRunning = false;
-            })
-          }
-        }
-        else{
-          axios.post(
-            'http://' + ip + ':' + port, req
-          ).then(function (response) {
-            console.log('big success!');
-          })
-          .catch(function (error) {
-            console.log('Error when sending cached request');
-          })
-        }
-      })
-      
-      if (decBackendRunning === false) {
-        fs.stat(upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer`), function(err, stat) {
-          if (err == null) {
-            let decspawn = exec("start /wait " + 
-            '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/YeastMateDetectionServer` + '"' + ' ' +
-              decPort + ' ' +
-              gpu
-            ));
-  
-            ioBackendRunning = true;
-  
-            decspawn.on('exit', (code, signal) => {
-              decBackendRunning = false;
-            })
-          }
-        })
-      }  
+      let iospawn = exec("start /wait " + 
+      '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`) + '"' + ' ' +
+      newport.toString()
+      );
     }
+})
 
+ipcMain.on('start-detection-backend', (event, port, gpu) => {
+  if (os.platform() === 'win32') {
+    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server.exe`);
+    let decspawn = exec( `start /wait "" "${exepath}" ${decPort} ${gpu}` );
   }
-  else {
-    axios.post(
-      'http://' + ip + ':' + port, req
-    ).then(function (response) {
-      console.log('big success!');
-    })
-    .catch(function (error) {
-      console.log('Error when sending cached request');
-    })
+
+  if (os.platform() === 'linux') {     
+
+    let decspawn = spawn('gnome-terminal', [
+      '-e',
+      '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server`) + '"',
+      decPort,
+      gpu
+      ]);
+  }
+
+  if (os.platform() === 'darwin') {
+    let decspawn = exec("start /wait " + 
+    '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server` + '"' + ' ' +
+      decPort + ' ' +
+      gpu
+    ));
   }
 })
 
@@ -336,6 +168,11 @@ app.on('ready', async () => {
       mainWindow.show();
       mainWindow.focus();
     }
+  });
+
+  mainWindow.webContents.on('new-window', function(e, url) {
+    e.preventDefault();
+    require('electron').shell.openExternal(url);
   });
   
   mainWindow.on('closed', () => {

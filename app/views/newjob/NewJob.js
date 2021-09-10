@@ -4,9 +4,8 @@ import { observer } from 'mobx-react-lite'
 import { v4 as uuidv4 } from 'uuid';
 const path = require('path');
 
-var electron = require('electron')
 const { dialog } = require('electron').remote;
-const { ipcRenderer } = require('electron')
+const { ipcRenderer } = require('electron');
 
 import axios from 'axios';
 var portscanner = require('portscanner');
@@ -33,10 +32,9 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const NewJob = (props) => {
-
   const [toasts, setToasts] = React.useState([{}])
-  const [ioBackendRunning, setIOBackendRunning] = React.useState(electron.remote.getGlobal('ioBackendRunning'))
-  const [decBackendRunning, setDecBackendRunning] = React.useState(electron.remote.getGlobal('decBackendRunning'))
+  const [ioBackendRunning, setIOBackendRunning] = React.useState(false)
+  const [decBackendRunning, setDecBackendRunning] = React.useState(false)
 
   const handleAddPathClick = () => {
     var selectedPath = dialog.showOpenDialog({
@@ -64,9 +62,15 @@ const NewJob = (props) => {
   }
 
   const getBackendStatus = async () => {
+    let ioIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
+    let ioPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
+
+    let decIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').decIP
+    let decPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').decPort
+
     try {
       const result = await axios(
-        props.props.detection.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea') + ":" + props.props.get('port'),
+        `http://${ioIP}:${ioPort}/status`
       );
       setIOBackendRunning(true);
     } catch (error) {
@@ -75,7 +79,7 @@ const NewJob = (props) => {
 
     try {
       const result = await axios(
-        props.props.get('ip') + ":" + props.props.get('port'),
+        `${decIP}:${decPort}/status`
       );
       setDecBackendRunning(true);
     } catch (error) {
@@ -108,9 +112,6 @@ const NewJob = (props) => {
   }
 
   const startBackends = () => {
-    portscanner.findAPortNotInUse(11002, 11201, '127.0.0.1', function(error, freePort) {
-      let newport = freePort
-    })
     if (
       props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === false &&
       props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localDetection === false
@@ -120,48 +121,68 @@ const NewJob = (props) => {
     }
 
     if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {
+        portscanner.findAPortNotInUse(11002, 12002, '127.0.0.1', function(error, freePort) {
+        props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort = freePort
+      })
+      
       if (ioBackendRunning === true) {
-        addToast('Local IO Backend running.', 'Local IO Backend is running.');
+        addToast('IO backend already connected.', 'Change backend settings if you want to change backends.');
       }
       else {
-        ipcRenderer.send('start-io-backend', ip, port, gpu)
+        ipcRenderer.send('start-io-backend', props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort)
         addToast('Starting local IO Backend.', 'A console windows should appear soon!');
       }
     }
     
     if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localDetection === true) {
       if (decBackendRunning === true) {
-        addToast('Local Detection Backend running.', 'Local Detection Backend is running.');
+        addToast('Detection backend already connected.', 'Change backend settings if you want to change backends.');
       }
       else {
-        ipcRenderer.send('start-detection-backend', ip, port, gpu)
+        let port = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
+
+        portscanner.findAPortNotInUse(port+1, port+201, '127.0.0.1', function(error, freePort) {
+          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort = freePort
+        })
+
+        let device = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionDevice
+        let config = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').configPath
+        let model = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').modelPath
+
+        ipcRenderer.send('start-detection-backend', device, port, config, model)
         addToast('Starting local Detection Backend.', 'A console windows should appear soon!');
       }
     }
   };
 
   const submitJob = () => {
+    if (ioBackendRunning === false) {
+      addToast('IO Backend not connected.', 'Check Backend settings.');
+      return
+    }
+
+    let ip = props.props.detection.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
+    let port = props.props.detection.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
     
     let req = {
       _id: uuidv4(),
       path: path.normalize(props.props.selection.get('path')),
       includeTag: props.props.selection.get('includeTag'),
       excludeTag: props.props.selection.get('excludeTag'),
+      backend: props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea'),
       preprocessing: props.props.preprocessing.get(props.props.selection.get('preprocessing')),
       detection: props.props.detection.get(props.props.selection.get('detection')),
       export: props.props.export.get(props.props.selection.get('export')),
     }
 
     axios.post(
-      'http://' + ip + ':' + port, req
+      `http://${ip}:${port}/submit`, req
     ).then(function (response) {
-      console.log('big success!');
+      addToast('Job sent!', 'Job sent to backend.');
     })
     .catch(function (error) {
-      console.log('Error when sending cached request');
+      addToast('Task failed!', 'Job could not be sent to backend.')
     })
-
-    addToast('Starting Backend!', '1-2 console windows should appear soon!');
   };
 
   React.useEffect(() => { 
@@ -169,7 +190,7 @@ const NewJob = (props) => {
 
     const interval = setInterval(() => {
       getBackendStatus();
-    }, 1000);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, []);
@@ -195,7 +216,7 @@ const NewJob = (props) => {
         <CCardFooter>
           <CFormGroup className="d-flex justify-content-between">
             <CButton size='sm' to="/backend"  color='primary'><FontAwesomeIcon icon='cog' /> Setup backends</CButton>
-            <CButton size='sm' onClick={startBackends} color='success'><FontAwesomeIcon icon='submit' /> Start backends</CButton>
+            <CButton size='sm' onClick={startBackends} color='success'><FontAwesomeIcon icon='upload' /> Start backends</CButton>
           </CFormGroup>
         </CCardFooter>
       </CCard>

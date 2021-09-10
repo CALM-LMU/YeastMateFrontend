@@ -17,10 +17,11 @@ const upath = require('upath');
 const spawn = require("child_process").spawn;
 const exec = require('child_process').exec;
 
+var runCommandTerminalMacOS = require('./callStuffMacoS').runCommandTerminalMacOS;
+
 let mainWindow = null;
 
-global.ioBackendRunning = false;
-global.decBackendRunning = false;
+global.resourcesPath = process.resourcesPath;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -86,7 +87,7 @@ ipcMain.on('start-io-backend', (event, port) => {
     // start windows backend
     if (os.platform() === 'win32') {
       let exepath = upath.toUnix(`C:/Users/david/Projects/BioElectron/python/YeastMate/hueyserver.exe`);
-      let iospawn = exec( `start /wait "" "${exepath}" --port ${newport.toString()}` );
+      let iospawn = exec( `start /wait "" "${exepath}" ${port}` );
     }
 
     // start linux backends
@@ -95,23 +96,28 @@ ipcMain.on('start-io-backend', (event, port) => {
       let iospawn = spawn('gnome-terminal', [
         '-e',
         '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`) + '"',
-        newport
+        port
         ]);
     }
 
     // start osx backends
     if (os.platform() === 'darwin') {
-      let iospawn = exec("start /wait " + 
-      '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`) + '"' + ' ' +
-      newport.toString()
-      );
+      exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`)
+      let iospawn = runCommandTerminalMacOS(`${exepath} ${port}`)
     }
 })
 
-ipcMain.on('start-detection-backend', (event, port, gpu) => {
+ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
+  if (device === 'gpu') {
+    deviceSwitch = '--gpu'
+  }
+  else {
+    deviceSwitch = ''
+  }
+
   if (os.platform() === 'win32') {
     let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server.exe`);
-    let decspawn = exec( `start /wait "" "${exepath}" ${decPort} ${gpu}` );
+    let decspawn = exec( `start /wait "" "${exepath}" ${deviceSwitch} --port ${port} --config ${config} --model ${model}` );
   }
 
   if (os.platform() === 'linux') {     
@@ -119,17 +125,14 @@ ipcMain.on('start-detection-backend', (event, port, gpu) => {
     let decspawn = spawn('gnome-terminal', [
       '-e',
       '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server`) + '"',
-      decPort,
+      port,
       gpu
       ]);
   }
 
   if (os.platform() === 'darwin') {
-    let decspawn = exec("start /wait " + 
-    '"' + upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server` + '"' + ' ' +
-      decPort + ' ' +
-      gpu
-    ));
+    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server.exe`);
+    let decspawn = runCommandTerminalMacOS(`${exepath} ${deviceSwitch} --port ${port} --config ${config} --model ${model}`)
   }
 })
 

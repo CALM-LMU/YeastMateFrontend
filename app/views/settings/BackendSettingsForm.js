@@ -1,19 +1,25 @@
 import React from 'react'
 import { observer } from "mobx-react-lite"
 
+const remote = require('electron').remote;
+const { dialog } = require('electron').remote;
+
 import {
   CCard,
   CCardBody,
   CCardHeader,
   CCol,
   CCollapse,
+  CButton,
   CForm,
   CFormGroup,
   CInput,
+  CInputGroupAppend,
   CLabel,
   CSelect,
   CSwitch,
 } from '@coreui/react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const BackendSettingsForm = (props) => {
   const selectPresetValue = 'f16dfd0d-39b0-4202-8fec-9ba7d3b0adea'
@@ -48,6 +54,42 @@ const BackendSettingsForm = (props) => {
 
   const handleGPUSelection = (value) => {
     props.props.get(selectPresetValue).detectionDevice = value
+  }
+
+  const setConfigPath = (value) => {
+    props.props.get(selectPresetValue).configPath = value
+  }
+
+  const setModelPath = (value) => {
+    props.props.get(selectPresetValue).modelPath = value
+  }
+
+  const handleConfigPathClick = () => {
+    var selectedPath = dialog.showOpenDialog({
+      properties: ['openFile']
+    });
+
+    if (typeof selectedPath !== 'undefined') {
+      props.props.get(selectPresetValue).configPath = selectedPath[0]
+    }
+  };
+
+  const handleModelPathClick = () => {
+    var selectedPath = dialog.showOpenDialog({
+      properties: ['openFile']
+    });
+
+    if (typeof selectedPath !== 'undefined') {
+      props.props.get(selectPresetValue).modelPath = selectedPath[0]
+    }
+  };
+
+  const handleConfigResetClick = () => {
+    props.props.get(selectPresetValue).configPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate.yaml';
+  }
+
+  const handleModelResetClick = () => {
+    props.props.get(selectPresetValue).modelPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate_weights.pth';
   }
 
   return (
@@ -95,6 +137,22 @@ const BackendSettingsForm = (props) => {
                     {'CPU'}
                   </option>
                 </CSelect>
+              </CFormGroup>
+              <CFormGroup>
+                <CLabel>Set IP adress of external detection server.</CLabel>
+                <CInputGroupAppend>
+                  <CInput id="pathInput" onChange={(event) => setConfigPath(event.currentTarget.value)} value={props.props.get(selectPresetValue).configPath}></CInput>
+                  <CButton onClick={handleConfigPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
+                  <CButton onClick={handleConfigResetClick} size="sm" color="success"><FontAwesomeIcon icon="sync" /> Reset Path</CButton>
+                </CInputGroupAppend>
+              </CFormGroup>
+              <CFormGroup>
+                <CLabel>Set IP adress of external detection server.</CLabel>
+                <CInputGroupAppend>
+                  <CInput id="pathInput" onChange={(event) => setModelPath(event.currentTarget.value)} value={props.props.get(selectPresetValue).modelPath}></CInput>
+                  <CButton onClick={handleModelPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
+                  <CButton onClick={handleModelResetClick} size="sm" color="success"><FontAwesomeIcon icon="sync" /> Reset Path</CButton>
+                </CInputGroupAppend>
               </CFormGroup>
             </CCollapse>
             <CCollapse show={!detectionCollapse}>

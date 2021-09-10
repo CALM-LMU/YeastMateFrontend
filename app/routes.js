@@ -1,6 +1,8 @@
 import React from 'react';
 import { observable } from 'mobx';
 
+const remote = require('electron').remote;
+
 const Store = require('electron-store');
 
 const PreprocessingSettings = React.lazy(() => import('./views/settings/PreprocessingSettingsForm'));
@@ -103,6 +105,8 @@ if (typeof store.get('backend') !== 'undefined') {
     detectionIP: '127.0.0.1',
     detectionPort:11003,
     detectionDevice: 'gpu',
+    configPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate.yaml',
+    modelPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate_weights.pth',
   })
 
 if (typeof store.get('selection') !== 'undefined') {

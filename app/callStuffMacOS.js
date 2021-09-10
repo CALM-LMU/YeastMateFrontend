@@ -13,5 +13,3 @@ const runCommandTerminalMacOS = (command) => {
 }
 
 module.exports = {runCommandTerminalMacOS: runCommandTerminalMacOS};
-
-// runCommandTerminalMacOS("man cp");

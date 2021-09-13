@@ -10,13 +10,13 @@ import {
   CCardFooter,
   CCardHeader,
   CCardText,
-  CCol,
   CCollapse,
   CDataTable,
   CForm,
   CFormGroup,
   CInput,
   CLabel,
+  CLink,
   CModal,
   CModalFooter,
   CModalHeader,
@@ -180,6 +180,11 @@ const PreprocessingSettingsForm = (props) => {
 
   return (
     <>
+     <CCard>
+        <CCardBody>
+          <CLabel>Check the documentation at <CLink target='_blank' href="https://yeastmate.readthedocs.org">yeastmate.readthedocs.org</CLink> for more details!</CLabel>
+        </CCardBody>
+      </CCard>
       <CCard>
         <CCardHeader>Preprocessing Settings</CCardHeader>
         <CCardBody >

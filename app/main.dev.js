@@ -102,17 +102,15 @@ ipcMain.on('start-io-backend', (event, port) => {
 
     // start osx backends
     if (os.platform() === 'darwin') {
-      exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`)
+      let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`)
       let iospawn = runCommandTerminalMacOS(`${exepath} ${port}`)
     }
 })
 
 ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
+  var deviceSwitch = ''
   if (device === 'gpu') {
     deviceSwitch = '--gpu'
-  }
-  else {
-    deviceSwitch = ''
   }
 
   if (os.platform() === 'win32') {
@@ -131,7 +129,7 @@ ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
   }
 
   if (os.platform() === 'darwin') {
-    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server.exe`);
+    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server`);
     let decspawn = runCommandTerminalMacOS(`${exepath} ${deviceSwitch} --port ${port} --config ${config} --model ${model}`)
   }
 })

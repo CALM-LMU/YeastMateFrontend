@@ -18,6 +18,7 @@ import {
   CInput,
   CInputGroupAppend,
   CLabel,
+  CLink,
   CSelect,
   CSwitch,
 } from '@coreui/react'
@@ -178,6 +179,11 @@ const BackendSettingsForm = (props) => {
 
   return (
     <>
+     <CCard>
+        <CCardBody>
+          <CLabel>Check the documentation at <CLink target='_blank' href="https://yeastmate.readthedocs.org">yeastmate.readthedocs.org</CLink> for more details!</CLabel>
+        </CCardBody>
+      </CCard>
       <CCard>
         <CCardHeader>
           Backend Status:

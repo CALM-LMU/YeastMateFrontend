@@ -168,8 +168,6 @@ app.on('ready', async () => {
     }
   });
 
-  require('remote').getCurrentWindow().debugDevTools();
-
   mainWindow.webContents.on('new-window', function(e, url) {
     e.preventDefault();
     require('electron').shell.openExternal(url);

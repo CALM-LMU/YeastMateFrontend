@@ -96,6 +96,7 @@ if (typeof store.get('backend') !== 'undefined') {
     backendPresetList.set(key, value)
   }
 }
+
   backendPresetList.set('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea', {
     name: 'Default',
     localIO: true,
@@ -108,6 +109,7 @@ if (typeof store.get('backend') !== 'undefined') {
     configPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate.yaml',
     modelPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate_weights.pth',
   })
+
 
 if (typeof store.get('selection') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('selection'))) {
@@ -125,13 +127,13 @@ else {
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard , data: presetSelection },
+  { path: '/dashboard', name: 'Dashboard', component: Dashboard , data: { backend : backendPresetList } },
   { path: '/job', name: 'New Job', component: StartNewJob, data: { selection: presetSelection, backend: backendPresetList, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList} },
   { path: '/annotate', name: 'Annotate your data', component: Annotate },
   { path: '/preprocessing', name: 'Preprocessing Settings', component: PreprocessingSettings, data: preprocessingPresetList },
   { path: '/detection', name: 'Detection Settings', component: DetectionSettings, data: detectPresetList },
   { path: '/export', name: 'Export Settings', component: ExportSettings, data: exportPresetList },
-  { path: '/backend', name: 'Backend Settings', component: BackendSettings, data: backendPresetList },
+  { path: '/backend', name: 'Backend Settings', component: BackendSettings, data: { backend: backendPresetList } },
 ];
 
 const prop =  {routes: routes, store: store, sidebarShow: sidebarShow, lists: { backend:backendPresetList, selection: presetSelection, preprocessing: preprocessingPresetList, detection: detectPresetList, export: exportPresetList }}

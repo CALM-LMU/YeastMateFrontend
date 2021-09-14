@@ -202,7 +202,6 @@ const BackendSettingsForm = (props) => {
         </CCardBody>
         <CCardFooter>
           <CFormGroup className="d-flex justify-content-between">
-            <CButton size='sm' to="/backend"  color='primary'><FontAwesomeIcon icon='cog' /> Setup backends</CButton>
             <CButton size='sm' onClick={startBackends} color='success'><FontAwesomeIcon icon='upload' /> Start backends</CButton>
           </CFormGroup>
         </CCardFooter>

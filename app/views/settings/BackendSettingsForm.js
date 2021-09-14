@@ -178,11 +178,11 @@ const BackendSettingsForm = (props) => {
   };
 
   const handleConfigResetClick = () => {
-    props.props.backend.get(selectPresetValue).configPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate.yaml';
+    props.props.backend.get(selectPresetValue).configPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/models/yeastmate.yaml';
   }
 
   const handleModelResetClick = () => {
-    props.props.backend.get(selectPresetValue).modelPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate_weights.pth';
+    props.props.backend.get(selectPresetValue).modelPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/models/yeastmate_weights.pth';
   }
 
   React.useEffect(() => { 

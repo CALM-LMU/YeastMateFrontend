@@ -39,9 +39,25 @@ const getStatusBadge = (status)=>{
 }
 
 const Dashboard = (props) => {
+  const [toasts, setToasts] = React.useState([{}])
   const [ioBackendRunning, setIOBackendRunning] = React.useState(false)
   const [decBackendRunning, setDecBackendRunning] = React.useState(false)
   const [jobList, setjobList] = React.useState([])
+
+  const toasters = (()=>{
+    return toasts.reduce((toasters, toast) => {
+      toasters[toast.position] = toasters[toast.position] || []
+      toasters[toast.position].push(toast)
+      return toasters
+    }, {})
+  })()
+
+  const addToast = (header, body) => {
+    setToasts([
+      ...toasts, 
+      { autohide: true && 5000, closeButton:true, fade:true, header:header, body:body, show:true }
+    ])
+  }
 
   const getBackendStatus = async () => {
     let ioIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
@@ -198,6 +214,32 @@ const Dashboard = (props) => {
           </CForm>
         </CCardBody>
       </CCard>
+      {Object.keys(toasters).map((toasterKey) => (
+            <CToaster
+              position={'top-right'}
+              key={'toaster' + toasterKey}
+            >
+              {
+                toasters[toasterKey].map((toast, key)=>{
+                return(
+                  <CToast
+                    key={'toast' + key}
+                    show={toast.show}
+                    autohide={toast.autohide}
+                    fade={toast.fade}
+                  >
+                  <CToastHeader closeButton={toast.closeButton}>
+                    {toast.header}
+                  </CToastHeader>
+                  <CToastBody >
+                    {toast.body}
+                  </CToastBody>
+              </CToast>
+              )
+            })
+            }
+          </CToaster>
+          ))}
     </>
   )
 }

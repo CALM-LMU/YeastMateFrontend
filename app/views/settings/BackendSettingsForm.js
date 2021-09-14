@@ -28,11 +28,27 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const BackendSettingsForm = (props) => {
+  const [toasts, setToasts] = React.useState([{}])
   const selectPresetValue = 'f16dfd0d-39b0-4202-8fec-9ba7d3b0adea'
   const [ioBackendRunning, setIOBackendRunning] = React.useState(false)
   const [decBackendRunning, setDecBackendRunning] = React.useState(false)
   const [ioCollapse, setIOCollapse] = React.useState(props.props.backend.get(selectPresetValue).localIO);
   const [detectionCollapse, setDetectionCollapse] = React.useState(props.props.backend.get(selectPresetValue).localDetection);
+
+  const toasters = (()=>{
+    return toasts.reduce((toasters, toast) => {
+      toasters[toast.position] = toasters[toast.position] || []
+      toasters[toast.position].push(toast)
+      return toasters
+    }, {})
+  })()
+
+  const addToast = (header, body) => {
+    setToasts([
+      ...toasts, 
+      { autohide: true && 5000, closeButton:true, fade:true, header:header, body:body, show:true }
+    ])
+  }
 
   const getBackendStatus = async () => {
     let ioIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
@@ -290,6 +306,32 @@ const BackendSettingsForm = (props) => {
           </CForm>
         </CCardBody>
       </CCard>
+      {Object.keys(toasters).map((toasterKey) => (
+            <CToaster
+              position={'top-right'}
+              key={'toaster' + toasterKey}
+            >
+              {
+                toasters[toasterKey].map((toast, key)=>{
+                return(
+                  <CToast
+                    key={'toast' + key}
+                    show={toast.show}
+                    autohide={toast.autohide}
+                    fade={toast.fade}
+                  >
+                  <CToastHeader closeButton={toast.closeButton}>
+                    {toast.header}
+                  </CToastHeader>
+                  <CToastBody >
+                    {toast.body}
+                  </CToastBody>
+              </CToast>
+              )
+            })
+            }
+          </CToaster>
+          ))}
     </>
   )
 }

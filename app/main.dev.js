@@ -83,7 +83,7 @@ ipcMain.on('start-napari', (event, folder) => {
 ipcMain.on('start-io-backend', (event, port) => {
     // start windows backend
     if (os.platform() === 'win32') {
-      let exepath = upath.toUnix(`C:/Users/david/Projects/BioElectron/python/YeastMate/hueyserver.exe`);
+      let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver.exe`);
       let iospawn = exec( `start /wait "" ${exepath} --port ${port}` );
     }
 
@@ -111,8 +111,8 @@ ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
   }
 
   if (os.platform() === 'win32') {
-    let exepath = upath.toUnix(`C:/Users/david/Projects/BioElectron/python/YeastMate/yeastmate_server.exe`);
-    let decspawn = exec( `start /wait "" ${exepath} ${deviceSwitch} --port ${port} --config ${config} --model ${model}` );
+    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server.exe`);
+    let decspawn = exec( `start /wait "" ${exepath} ${deviceSwitch} --port ${port}` );
   }
 
   if (os.platform() === 'linux') {     

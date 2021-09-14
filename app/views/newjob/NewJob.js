@@ -120,15 +120,15 @@ const NewJob = (props) => {
       return
     }
 
-    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {
-        portscanner.findAPortNotInUse(11002, 12002, '127.0.0.1', function(error, freePort) {
-        props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort = freePort
-      })
-      
+    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {      
       if (ioBackendRunning === true) {
         addToast('IO backend already connected.', 'Change backend settings if you want to change backends.');
       }
       else {
+        portscanner.findAPortNotInUse(11002, 12002, '127.0.0.1', function(error, freePort) {
+          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort = freePort
+        })
+
         ipcRenderer.send('start-io-backend', props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort)
         addToast('Starting local IO Backend.', 'A console windows should appear soon!');
       }
@@ -143,13 +143,14 @@ const NewJob = (props) => {
 
         portscanner.findAPortNotInUse(port+1, port+201, '127.0.0.1', function(error, freePort) {
           props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort = freePort
+          var decport = freePort
         })
-
+        
         let device = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionDevice
         let config = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').configPath
         let model = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').modelPath
 
-        ipcRenderer.send('start-detection-backend', device, port, config, model)
+        ipcRenderer.send('start-detection-backend', device, decport, config, model)
         addToast('Starting local Detection Backend.', 'A console windows should appear soon!');
       }
     }

@@ -61,7 +61,7 @@ ipcMain.on('open-file-dialog-for-file', function (event) {
      });
  });
 
-ipcMain.on('start-napari', (event, path, scoreThresholds) => {
+ipcMain.on('start-napari', (event, folder) => {
   if (os.platform() === 'linux') {
 		let an = spawn('gnome-terminal', [
 		'-e',
@@ -75,11 +75,8 @@ ipcMain.on('start-napari', (event, path, scoreThresholds) => {
     ]);
   }
   if (os.platform() === 'win32') {
-    let an = spawn("cmd.exe", [
-      "/c", 
-      upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation.exe`), 
-      path
-    ]);
+    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation.exe`);
+    let an = exec(`start /wait "" ${exepath} ${folder}`);
   }
 })
 
@@ -87,7 +84,7 @@ ipcMain.on('start-io-backend', (event, port) => {
     // start windows backend
     if (os.platform() === 'win32') {
       let exepath = upath.toUnix(`C:/Users/david/Projects/BioElectron/python/YeastMate/hueyserver.exe`);
-      let iospawn = exec( `start /wait "" "${exepath}" ${port}` );
+      let iospawn = exec( `start /wait "" ${exepath} --port ${port}` );
     }
 
     // start linux backends
@@ -103,7 +100,7 @@ ipcMain.on('start-io-backend', (event, port) => {
     // start osx backends
     if (os.platform() === 'darwin') {
       let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`)
-      let iospawn = runCommandTerminalMacOS(`${exepath} ${port}`)
+      let iospawn = runCommandTerminalMacOS(`${exepath} --port ${port}`)
     }
 })
 
@@ -114,8 +111,8 @@ ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
   }
 
   if (os.platform() === 'win32') {
-    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server.exe`);
-    let decspawn = exec( `start /wait "" "${exepath}" ${deviceSwitch} --port ${port} --config ${config} --model ${model}` );
+    let exepath = upath.toUnix(`C:/Users/david/Projects/BioElectron/python/YeastMate/yeastmate_server.exe`);
+    let decspawn = exec( `start /wait "" ${exepath} ${deviceSwitch} --port ${port} --config ${config} --model ${model}` );
   }
 
   if (os.platform() === 'linux') {     
@@ -170,6 +167,8 @@ app.on('ready', async () => {
       mainWindow.focus();
     }
   });
+
+  require('remote').getCurrentWindow().debugDevTools();
 
   mainWindow.webContents.on('new-window', function(e, url) {
     e.preventDefault();

@@ -5,6 +5,9 @@ const remote = require('electron').remote;
 const { dialog } = require('electron').remote;
 const { ipcRenderer } = require('electron');
 
+import axios from 'axios';
+var portscanner = require('portscanner');
+
 import {
   CCard,
   CCardBody,
@@ -28,15 +31,15 @@ const BackendSettingsForm = (props) => {
   const selectPresetValue = 'f16dfd0d-39b0-4202-8fec-9ba7d3b0adea'
   const [ioBackendRunning, setIOBackendRunning] = React.useState(false)
   const [decBackendRunning, setDecBackendRunning] = React.useState(false)
-  const [ioCollapse, setIOCollapse] = React.useState(props.props.get(selectPresetValue).localIO);
-  const [detectionCollapse, setDetectionCollapse] = React.useState(props.props.get(selectPresetValue).localDetection);
+  const [ioCollapse, setIOCollapse] = React.useState(props.props.backend.get(selectPresetValue).localIO);
+  const [detectionCollapse, setDetectionCollapse] = React.useState(props.props.backend.get(selectPresetValue).localDetection);
 
   const getBackendStatus = async () => {
     let ioIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
     let ioPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
 
-    let decIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').decIP
-    let decPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').decPort
+    let decIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionIP
+    let decPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort
 
     try {
       const result = await axios(
@@ -49,7 +52,7 @@ const BackendSettingsForm = (props) => {
 
     try {
       const result = await axios(
-        `${decIP}:${decPort}/status`
+        `http://${decIP}:${decPort}/status`
       );
       setDecBackendRunning(true);
     } catch (error) {
@@ -66,15 +69,15 @@ const BackendSettingsForm = (props) => {
       return
     }
 
-    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {
-        portscanner.findAPortNotInUse(11002, 12002, '127.0.0.1', function(error, freePort) {
-        props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort = freePort
-      })
-      
+    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {      
       if (ioBackendRunning === true) {
         addToast('IO backend already connected.', 'Change backend settings if you want to change backends.');
       }
       else {
+        portscanner.findAPortNotInUse(11002, 12002, '127.0.0.1', function(error, freePort) {
+          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort = freePort
+        })
+
         ipcRenderer.send('start-io-backend', props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort)
         addToast('Starting local IO Backend.', 'A console windows should appear soon!');
       }
@@ -86,57 +89,56 @@ const BackendSettingsForm = (props) => {
       }
       else {
         let port = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
-
-        portscanner.findAPortNotInUse(port+1, port+201, '127.0.0.1', function(error, freePort) {
-          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort = freePort
-        })
-
         let device = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionDevice
         let config = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').configPath
         let model = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').modelPath
 
-        ipcRenderer.send('start-detection-backend', device, port, config, model)
-        addToast('Starting local Detection Backend.', 'A console windows should appear soon!');
+        portscanner.findAPortNotInUse(port+1, port+201, '127.0.0.1', function(error, freePort) {
+          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort = freePort
+
+          ipcRenderer.send('start-detection-backend', device, freePort, config, model)
+          addToast('Starting local Detection Backend.', 'A console windows should appear soon!');
+        })      
       }
     }
   };
 
   const switchIO = () => {
-    props.props.get(selectPresetValue).localIO =  !props.props.get(selectPresetValue).localIO
-    setIOCollapse(props.props.get(selectPresetValue).localIO)
+    props.props.backend.get(selectPresetValue).localIO =  !props.props.backend.get(selectPresetValue).localIO
+    setIOCollapse(props.props.backend.get(selectPresetValue).localIO)
   }
 
   const switchDetection = () => {
-    props.props.get(selectPresetValue).localDetection =  !props.props.get(selectPresetValue).localDetection
-    setDetectionCollapse(props.props.get(selectPresetValue).localDetection)
+    props.props.backend.get(selectPresetValue).localDetection =  !props.props.backend.get(selectPresetValue).localDetection
+    setDetectionCollapse(props.props.backend.get(selectPresetValue).localDetection)
   }
 
   const setIOIP = (value) => {
-    props.props.get(selectPresetValue).ioIP = value
+    props.props.backend.get(selectPresetValue).ioIP = value
   }
   
   const setIOPort = (value) => {
-    props.props.get(selectPresetValue).ioIP = value
+    props.props.backend.get(selectPresetValue).ioIP = value
   }
 
   const setDetectionIP = (value) => {
-    props.props.get(selectPresetValue).detectionIP = value
+    props.props.backend.get(selectPresetValue).detectionIP = value
   }
   
   const setDetectionPort = (value) => {
-    props.props.get(selectPresetValue).detectionPort = value
+    props.props.backend.get(selectPresetValue).detectionPort = value
   }
 
   const handleGPUSelection = (value) => {
-    props.props.get(selectPresetValue).detectionDevice = value
+    props.props.backend.get(selectPresetValue).detectionDevice = value
   }
 
   const setConfigPath = (value) => {
-    props.props.get(selectPresetValue).configPath = value
+    props.props.backend.get(selectPresetValue).configPath = value
   }
 
   const setModelPath = (value) => {
-    props.props.get(selectPresetValue).modelPath = value
+    props.props.backend.get(selectPresetValue).modelPath = value
   }
 
   const handleConfigPathClick = () => {
@@ -145,7 +147,7 @@ const BackendSettingsForm = (props) => {
     });
 
     if (typeof selectedPath !== 'undefined') {
-      props.props.get(selectPresetValue).configPath = selectedPath[0]
+      props.props.backend.get(selectPresetValue).configPath = selectedPath[0]
     }
   };
 
@@ -155,16 +157,16 @@ const BackendSettingsForm = (props) => {
     });
 
     if (typeof selectedPath !== 'undefined') {
-      props.props.get(selectPresetValue).modelPath = selectedPath[0]
+      props.props.backend.get(selectPresetValue).modelPath = selectedPath[0]
     }
   };
 
   const handleConfigResetClick = () => {
-    props.props.get(selectPresetValue).configPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate.yaml';
+    props.props.backend.get(selectPresetValue).configPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate.yaml';
   }
 
   const handleModelResetClick = () => {
-    props.props.get(selectPresetValue).modelPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate_weights.pth';
+    props.props.backend.get(selectPresetValue).modelPath = remote.getGlobal('resourcesPath') + '/python/YeastMate/yeastmate-artifacts/yeastmate_weights.pth';
   }
 
   React.useEffect(() => { 
@@ -213,7 +215,7 @@ const BackendSettingsForm = (props) => {
             <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup className="d-flex justify-content-between">
               <CLabel>Run local IO backend?</CLabel>
-              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchIO} checked={props.props.get(selectPresetValue).localIO} id="boxYes"/>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchIO} checked={props.props.backend.get(selectPresetValue).localIO} id="boxYes"/>
             </CFormGroup>
             <CCollapse show={!ioCollapse}>
               <CFormGroup row>
@@ -221,7 +223,7 @@ const BackendSettingsForm = (props) => {
                     <CLabel>Set IP adress of external IO server.</CLabel>
                   </CCol>
                   <CCol md='2'>
-                    <CInput defaultValue={props.props.get(selectPresetValue).ioIP} onChange={(event) => setIOIP(event.currentTarget.value)}/>
+                    <CInput defaultValue={props.props.backend.get(selectPresetValue).ioIP} onChange={(event) => setIOIP(event.currentTarget.value)}/>
                   </CCol>
                 </CFormGroup>
                 <CFormGroup row>
@@ -229,19 +231,19 @@ const BackendSettingsForm = (props) => {
                     <CLabel>Set port of external IO server.</CLabel>
                   </CCol>
                   <CCol md='2'>
-                    <CInput defaultValue={props.props.get(selectPresetValue).ioPort} onChange={(event) => setIOPort(event.currentTarget.value)}/>
+                    <CInput defaultValue={props.props.backend.get(selectPresetValue).ioPort} onChange={(event) => setIOPort(event.currentTarget.value)}/>
                   </CCol>
                 </CFormGroup>
               </CCollapse>
             <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup  className="d-flex justify-content-between">
               <CLabel>Run local detection backend?</CLabel>
-              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchDetection} checked={props.props.get(selectPresetValue).localDetection} id="scaleYes"/>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchDetection} checked={props.props.backend.get(selectPresetValue).localDetection} id="scaleYes"/>
             </CFormGroup>
             <CCollapse show={detectionCollapse}>
               <CFormGroup>
                 <CLabel>Run local detection backend on GPU or CPU?</CLabel>
-                <CSelect value={props.props.get(selectPresetValue).detectionDevice} onChange={(event) => handleGPUSelection(event.currentTarget.value)} custom name='select' id='selectDevice'>
+                <CSelect value={props.props.backend.get(selectPresetValue).detectionDevice} onChange={(event) => handleGPUSelection(event.currentTarget.value)} custom name='select' id='selectDevice'>
                   <option value={'gpu'} name={'GPU'}>
                     {'GPU'}
                   </option>
@@ -251,17 +253,17 @@ const BackendSettingsForm = (props) => {
                 </CSelect>
               </CFormGroup>
               <CFormGroup>
-                <CLabel>Set IP adress of external IO server.</CLabel>
+                <CLabel>Set path to model configuration file.</CLabel>
                 <CInputGroupAppend>
-                  <CInput id="pathInput" onChange={(event) => setConfigPath(event.currentTarget.value)} value={props.props.get(selectPresetValue).configPath}></CInput>
+                  <CInput id="pathInput" onChange={(event) => setConfigPath(event.currentTarget.value)} value={props.props.backend.get(selectPresetValue).configPath}></CInput>
                   <CButton onClick={handleConfigPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
                   <CButton onClick={handleConfigResetClick} size="sm" color="success"><FontAwesomeIcon icon="sync" /> Reset Path</CButton>
                 </CInputGroupAppend>
               </CFormGroup>
               <CFormGroup>
-                <CLabel>Set IP adress of external detection server.</CLabel>
+                <CLabel>Set path to model weight file.</CLabel>
                 <CInputGroupAppend>
-                  <CInput id="pathInput" onChange={(event) => setModelPath(event.currentTarget.value)} value={props.props.get(selectPresetValue).modelPath}></CInput>
+                  <CInput id="pathInput" onChange={(event) => setModelPath(event.currentTarget.value)} value={props.props.backend.get(selectPresetValue).modelPath}></CInput>
                   <CButton onClick={handleModelPathClick} size="sm" color="primary"><FontAwesomeIcon icon="plus" /> Select Path</CButton>
                   <CButton onClick={handleModelResetClick} size="sm" color="success"><FontAwesomeIcon icon="sync" /> Reset Path</CButton>
                 </CInputGroupAppend>
@@ -273,7 +275,7 @@ const BackendSettingsForm = (props) => {
                     <CLabel>Set IP adress of external detection server.</CLabel>
                   </CCol>
                   <CCol md='2'>
-                    <CInput defaultValue={props.props.get(selectPresetValue).detectionIP} onChange={(event) => setDetectionIP(event.currentTarget.value)}/>
+                    <CInput defaultValue={props.props.backend.get(selectPresetValue).detectionIP} onChange={(event) => setDetectionIP(event.currentTarget.value)}/>
                   </CCol>
                 </CFormGroup>
                 <CFormGroup row>
@@ -281,7 +283,7 @@ const BackendSettingsForm = (props) => {
                     <CLabel>Set port of external detection server.</CLabel>
                   </CCol>
                   <CCol md='2'>
-                    <CInput defaultValue={props.props.get(selectPresetValue).detectionPort} onChange={(event) => setDetectionPort(event.currentTarget.value)}/>
+                    <CInput defaultValue={props.props.backend.get(selectPresetValue).detectionPort} onChange={(event) => setDetectionPort(event.currentTarget.value)}/>
                   </CCol>
                 </CFormGroup>
               </CCollapse>

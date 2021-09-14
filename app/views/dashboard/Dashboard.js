@@ -47,8 +47,8 @@ const Dashboard = (props) => {
     let ioIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
     let ioPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
 
-    let decIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').decIP
-    let decPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').decPort
+    let decIP = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionIP
+    let decPort = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort
 
     try {
       const result = await axios(
@@ -61,7 +61,7 @@ const Dashboard = (props) => {
 
     try {
       const result = await axios(
-        `${decIP}:${decPort}/status`
+        `http://${decIP}:${decPort}/status`
       );
       setDecBackendRunning(true);
     } catch (error) {
@@ -78,15 +78,15 @@ const Dashboard = (props) => {
       return
     }
 
-    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {
-        portscanner.findAPortNotInUse(11002, 12002, '127.0.0.1', function(error, freePort) {
-        props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort = freePort
-      })
-      
+    if (props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').localIO === true) {      
       if (ioBackendRunning === true) {
         addToast('IO backend already connected.', 'Change backend settings if you want to change backends.');
       }
       else {
+        portscanner.findAPortNotInUse(11002, 12002, '127.0.0.1', function(error, freePort) {
+          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort = freePort
+        })
+
         ipcRenderer.send('start-io-backend', props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort)
         addToast('Starting local IO Backend.', 'A console windows should appear soon!');
       }
@@ -98,26 +98,27 @@ const Dashboard = (props) => {
       }
       else {
         let port = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
-
-        portscanner.findAPortNotInUse(port+1, port+201, '127.0.0.1', function(error, freePort) {
-          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort = freePort
-        })
-
         let device = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionDevice
         let config = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').configPath
         let model = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').modelPath
 
-        ipcRenderer.send('start-detection-backend', device, port, config, model)
-        addToast('Starting local Detection Backend.', 'A console windows should appear soon!');
+        portscanner.findAPortNotInUse(port+1, port+201, '127.0.0.1', function(error, freePort) {
+          props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort = freePort
+
+          ipcRenderer.send('start-detection-backend', device, freePort, config, model)
+          addToast('Starting local Detection Backend.', 'A console windows should appear soon!');
+        })      
       }
     }
   };
 
   const getJobs = async () => {
-    console.log(props.props.get('ip')  + ":" + props.props.get('port'))
+    let ip = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
+    let port = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
+
     try {
       const result = await axios(
-        props.props.get('ip') + ":" + props.props.get('port'),
+        `http://${ip}:${port}/tasks`,
       );
       setjobList(result.data.tasks);
     } catch (error) {

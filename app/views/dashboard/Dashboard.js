@@ -16,6 +16,10 @@ import {
   CFormGroup,
   CLabel,
   CSwitch,
+  CToast,
+  CToastBody,
+  CToastHeader,
+  CToaster
 } from '@coreui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 

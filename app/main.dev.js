@@ -76,7 +76,7 @@ ipcMain.on('start-napari', (event, folder) => {
   }
   if (os.platform() === 'win32') {
     let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation.exe`);
-    let an = exec(`start /wait "" ${exepath} ${folder}`);
+    let an = exec(`start /wait "" "${exepath}" ${folder}`);
   }
 })
 
@@ -84,7 +84,7 @@ ipcMain.on('start-io-backend', (event, port) => {
     // start windows backend
     if (os.platform() === 'win32') {
       let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver.exe`);
-      let iospawn = exec( `start /wait "" ${exepath} --port ${port}` );
+      let iospawn = exec( `start /wait "" "${exepath}" --port ${port}` );
     }
 
     // start linux backends
@@ -112,7 +112,7 @@ ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
 
   if (os.platform() === 'win32') {
     let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server.exe`);
-    let decspawn = exec( `start /wait "" ${exepath} ${deviceSwitch} --port ${port}` );
+    let decspawn = exec( `start /wait "" "${exepath}" ${deviceSwitch} --port ${port}` );
   }
 
   if (os.platform() === 'linux') {     

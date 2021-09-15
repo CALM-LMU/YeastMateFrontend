@@ -90,7 +90,7 @@ ipcMain.on('start-io-backend', (event, port) => {
     // start linux backends
     if (os.platform() === 'linux') { 
       
-      let terminal = 'gnome-terminal';
+      let terminal = 'x-terminal-emulator';
 
       let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`);
       let iospawn = exec( `${terminal} -e "${exepath} --port ${port}"` );
@@ -116,7 +116,7 @@ ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
 
   if (os.platform() === 'linux') {     
 
-    let terminal = 'gnome-terminal';
+    let terminal = 'x-terminal-emulator';
 
     let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server`);
     let decspawn = exec( `${terminal} -e "${exepath} ${deviceSwitch} --port ${port} --config ${config} --model ${model}"` )

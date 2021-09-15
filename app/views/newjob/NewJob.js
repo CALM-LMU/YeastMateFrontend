@@ -160,8 +160,8 @@ const NewJob = (props) => {
       return
     }
 
-    let ip = props.props.detection.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
-    let port = props.props.detection.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
+    let ip = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioIP
+    let port = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').ioPort
     
     let req = {
       _id: uuidv4(),

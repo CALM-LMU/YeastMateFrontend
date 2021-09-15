@@ -17,7 +17,7 @@ const upath = require('upath');
 const spawn = require("child_process").spawn;
 const exec = require('child_process').exec;
 
-var runCommandTerminalMacOS = require('./callStuffMacoS').runCommandTerminalMacOS;
+var runCommandTerminalMacOS = require('./callStuffMacOS').runCommandTerminalMacOS;
 
 let mainWindow = null;
 

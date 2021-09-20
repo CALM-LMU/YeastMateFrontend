@@ -41,7 +41,7 @@ export default [
   },
   {
     _tag: 'CSidebarNavItem',
-    name: 'Export',
+    name: 'Save Crops',
     to: '/export',
     icon: 'cil-settings',
   },

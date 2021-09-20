@@ -2,7 +2,7 @@
   "name": "yeastmate",
   "productName": "yeastmate",
   "version": "0.11.0",
-  "description": "YeastMate Electron/React Interface using BioDetectron",
+  "description": "YeastMate Electron/React Interface",
   "main": "./main.prod.js",
   "author": {
     "name": "David Bunk",

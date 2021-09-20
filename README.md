@@ -1,5 +1,5 @@
-# BioElectron
-Electron GUI for BioDetectron
+# YeastMateFrontend
+YeastMate Electron GUI 
 
 Built from templates from:
 

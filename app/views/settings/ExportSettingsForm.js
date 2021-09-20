@@ -172,11 +172,11 @@ const ExportSettingsForm = (props) => {
         </CCardBody>
       </CCard>
       <CCard>
-        <CCardHeader>Export Settings</CCardHeader>
+        <CCardHeader>Crop Settings</CCardHeader>
         <CCardBody >
           <CForm encType="multipart/form-data" className="form-horizontal">
             <CFormGroup>
-              <CLabel>Select Export Preset</CLabel>
+              <CLabel>Select Crop Preset</CLabel>
               <CSelect value={selectPresetValue} onChange={(event) => setselectPresetValue(event.currentTarget.value)} custom id="selectPreset">
                 {Array.from( props.props ).map(([key, value]) => {
                   return props.props.get(key).name &&

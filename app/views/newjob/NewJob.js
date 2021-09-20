@@ -281,13 +281,13 @@ const NewJob = (props) => {
               </CSelect>
             </CFormGroup>
             <CFormGroup>
-              <CLabel>Select your preset for <CLink to="/export"> export settings.</CLink></CLabel>
+              <CLabel>Select your preset for <CLink to="/export"> crop settings.</CLink></CLabel>
               <CSelect value={props.props.selection.get('export')} onChange={(event) => handleExportSelection(event.currentTarget.value)} custom name='select' id='selectExport'>
                 <option
                   value={null}
                   name='No export'
                   >
-                    No export
+                    No Cropping
                 </option>
                 {Array.from( props.props.export ).map(([key, value]) => {
                     return props.props.export.get(key).name &&

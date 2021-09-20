@@ -2,7 +2,7 @@
   "name": "yeastmate",
   "productName": "yeastmate",
   "version": "0.11.0",
-  "description": "YeastMate Electron/React Interface using BioDetectron",
+  "description": "YeastMate Electron/React Interface",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development webpack --config ./configs/webpack.config.renderer.dev.dll.babel.js --colors",
@@ -25,7 +25,7 @@
   },
   "build": {
     "productName": "YeastMate",
-    "appId": "org.bunk.bioelectron",
+    "appId": "org.hoerlteam.yeastmate",
     "extends": null,
     "files": [
       "dist/",
@@ -81,14 +81,14 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "davidbunk",
+      "owner": "hoerlteam",
       "repo": "YeastMate",
       "private": true
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidbunk/YeastMate.git"
+    "url": "git+https://github.com/hoerlteam/YeastMateFrontend.git"
   },
   "author": {
     "name": "David Bunk",
@@ -97,12 +97,12 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/davidbunk/YeastMate/issues"
+    "url": "https://github.com/hoerlteam/YeastMate/issues"
   },
   "keywords": [
     "yeastmate"
   ],
-  "homepage": "https://github.com/davidbunk/YeastMate",
+  "homepage": "https://github.com/hoerlteam/YeastMate",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {

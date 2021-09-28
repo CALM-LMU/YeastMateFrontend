@@ -104,7 +104,7 @@ if (typeof store.get('backend') !== 'undefined') {
     ioPort: 11002,
     localDetection: true,
     detectionIP: '127.0.0.1',
-    detectionPort:11003,
+    detectionPort:11005,
     detectionDevice: 'gpu',
     configPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/models/yeastmate.yaml',
     modelPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/models/yeastmate_weights.pth',

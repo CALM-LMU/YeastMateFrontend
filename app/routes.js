@@ -61,6 +61,7 @@ exportPresetList.set('1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f', {
     {'Class ID':1,'Tag':'Mating zygotes','Crop':'True'},
     {'Class ID':2,'Tag':'Budding events','Crop':'True'},
   ],
+  keepID: false,
   boxExpansion: false,
   boxSize: 200,
   boxScaleSwitch: false,

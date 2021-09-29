@@ -81,6 +81,10 @@ const ExportSettingsForm = (props) => {
     }
   }
 
+  const switchID = () => {
+    props.props.get(selectPresetValue).keepID = !props.props.get(selectPresetValue).keepID
+  }
+
   const switchBox = () => {
     if (props.props.get(selectPresetValue).boxExpansion === false && props.props.get(selectPresetValue).boxScaleSwitch === true) {
       props.props.get(selectPresetValue).boxScaleSwitch = false
@@ -109,6 +113,13 @@ const ExportSettingsForm = (props) => {
     props.props.get(selectPresetValue).boxScale = value
   }
 
+  const getDisabled = (index) => {
+    if (index === 0) {
+      return true
+    }
+    return false
+  }
+
   const setTag = (index, value) => {
       props.props.get(selectPresetValue).classes[index].Tag = value
       props.props.get(selectPresetValue).classes = [...props.props.get(selectPresetValue).classes]
@@ -125,17 +136,6 @@ const ExportSettingsForm = (props) => {
     }
   };
 
-  const handleChannelAdd = () => {
-    props.props.get(selectPresetValue).classes.push({"Class ID": props.props.get(selectPresetValue).classes.length+1, 'Tag':"", 'Crop': "True", "Mask": "True"})
-    props.props.get(selectPresetValue).classes = [...props.props.get(selectPresetValue).classes]
-  }; 
-
-  const handleChannelRemove = () => {
-    props.props.get(selectPresetValue).classes.pop()
-    props.props.get(selectPresetValue).classes = [...props.props.get(selectPresetValue).classes]
-  };
-
-
   const handleAddPreset = () => {
     setModalAdd(false)
 
@@ -143,6 +143,7 @@ const ExportSettingsForm = (props) => {
     props.props.set(id, {
       name: NameInput,
       classes: props.props.get(selectPresetValue).classes,
+      keepID: props.props.get(selectPresetValue).keepID,
       boxSize: props.props.get(selectPresetValue).boxSize,
       boxExpansion: props.props.get(selectPresetValue).boxExpansion,
       boxScaleSwitch: props.props.get(selectPresetValue).boxScaleSwitch,
@@ -190,15 +191,13 @@ const ExportSettingsForm = (props) => {
               </CSelect>
             </CFormGroup>
             <CFormGroup><CLabel></CLabel></CFormGroup>
-            <CFormGroup row>
-              <CCol md="9">
-                  <CLabel>Generate crops of fixed size?</CLabel>
-              </CCol>
-              <CCol md="3">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchBox} checked={props.props.get(selectPresetValue).boxExpansion} id="boxYes"/>
-                </CFormGroup>
-              </CCol>
+            <CFormGroup  className="d-flex justify-content-between">
+              <CLabel>Keep overview cell IDs in the mask crops?</CLabel>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchID} checked={props.props.get(selectPresetValue).keepID} id="idYes"/>
+            </CFormGroup>
+            <CFormGroup  className="d-flex justify-content-between">
+              <CLabel>Generate crops of fixed size?</CLabel>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchBox} checked={props.props.get(selectPresetValue).boxExpansion} id="boxYes"/>
             </CFormGroup>
             <CCollapse show={boxCollapse}> 
               <CFormGroup row>
@@ -210,15 +209,9 @@ const ExportSettingsForm = (props) => {
                 </CCol>
               </CFormGroup>
             </CCollapse>
-            <CFormGroup row>
-              <CCol md="9">
-                  <CLabel>Scale bounding boxes of detected cells?</CLabel>
-              </CCol>
-              <CCol md="3">
-                <CFormGroup>
-                  <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchScale} checked={props.props.get(selectPresetValue).boxScaleSwitch} id="scaleYes"/>
-                </CFormGroup>
-              </CCol>
+            <CFormGroup  className="d-flex justify-content-between">
+              <CLabel>Scale bounding boxes of detected cells?</CLabel>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchScale} checked={props.props.get(selectPresetValue).boxScaleSwitch} id="scaleYes"/>
             </CFormGroup>
             <CCollapse show={scaleCollapse}> 
               <CFormGroup row>
@@ -226,10 +219,11 @@ const ExportSettingsForm = (props) => {
                   <CLabel>Factor to scale boxes by.</CLabel>
                 </CCol>
                 <CCol md="3">
-                  <CInput type='number' min={0} step={0.05} defaultValue={props.props.get(selectPresetValue).boxScale} onChange={(event) => setBoxScale(vent.currentTarget.value)}/>
+                  <CInput type='number' min={0} step={0.05} defaultValue={props.props.get(selectPresetValue).boxScale} onChange={(event) => setBoxScale(event.currentTarget.value)}/>
                 </CCol>
               </CFormGroup>
             </CCollapse>
+            <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup>
               <CDataTable
                 items={props.props.get(selectPresetValue).classes}
@@ -245,8 +239,8 @@ const ExportSettingsForm = (props) => {
                     ),
                   'Save crops':
                     (item)=>(
-                      <td>
-                        <CBadge color={getCropBadge(item.Crop)}>
+                      <td style={{"text-align":"center", "vertical-align":"center"}}>
+                        <CBadge color={getCropBadge(item.Crop)} shape='rounded-pill'>
                           {item.Crop}
                         </CBadge>
                       </td>
@@ -254,22 +248,17 @@ const ExportSettingsForm = (props) => {
                     'Toggle':
                       (item, index)=>{
                         return (
-                          <CButton onClick={()=>{toggleCropStatus(index)}} color="dark" size="md" variant="outline">
-                            <FontAwesomeIcon icon="sync"/>   Crop
-                          </CButton>
+                          <td>
+                            <CButton disabled={getDisabled(index)} onClick={()=>{toggleCropStatus(index)}} color="dark" size="sm" variant="outline">
+                              <FontAwesomeIcon icon="sync"/>   Crop
+                            </CButton>
+                          </td>
                       )
                     }
                   }
                 }
               />
-              <CButton onClick={()=>{handleChannelAdd()}} color="success" size="sm">
-                <FontAwesomeIcon icon="plus"/>   Add Class
-              </CButton>
-              <CButton onClick={()=>{handleChannelRemove()}} color="danger" size="sm">
-                <FontAwesomeIcon icon="ban"/>   Remove last class
-              </CButton>
             </CFormGroup>
-            <CFormGroup><CLabel></CLabel></CFormGroup>
           </CForm>
           <CModal 
               show={modalAdd} 

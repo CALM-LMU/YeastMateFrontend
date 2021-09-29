@@ -192,8 +192,8 @@ const ExportSettingsForm = (props) => {
             </CFormGroup>
             <CFormGroup><CLabel></CLabel></CFormGroup>
             <CFormGroup  className="d-flex justify-content-between">
-              <CLabel>Keep overview cell IDs in the mask crops?</CLabel>
-              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchID} checked={props.props.get(selectPresetValue).keepID} id="idYes"/>
+              <CLabel>Reassign labels (mating: 1/2=mother 3=daughter, budding: 1: mother 2: daughter) in every crop</CLabel>
+              <CSwitch className={'mx-1'} variant={'3d'} color={'primary'} onChange={switchID} checked={!props.props.get(selectPresetValue).keepID} id="idYes"/>
             </CFormGroup>
             <CFormGroup  className="d-flex justify-content-between">
               <CLabel>Generate crops of fixed size?</CLabel>

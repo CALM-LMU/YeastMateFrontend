@@ -132,7 +132,6 @@ const DetectionSettingsForm = (props) => {
       pixelSize: props.props.get(selectPresetValue).pixelSize,
       referencePixelSize: props.props.get(selectPresetValue).referencePixelSize,
       advancedSettings: props.props.get(selectPresetValue).advancedSettings,
-      superAdvancedSettings: props.props.get(selectPresetValue).superAdvancedSettings,
       singleThreshold: props.props.get(selectPresetValue).singleThreshold,
       matingThreshold: props.props.get(selectPresetValue).matingThreshold,
       buddingThreshold: props.props.get(selectPresetValue).buddingThreshold,

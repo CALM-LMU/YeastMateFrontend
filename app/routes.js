@@ -120,7 +120,7 @@ if (typeof store.get('selection') !== 'undefined') {
 else {
   presetSelection.set('path', '')
   presetSelection.set('includeTag', '')
-  presetSelection.set('excludeTag', '')
+  presetSelection.set('excludeTag', '_mask')
   presetSelection.set('preprocessing', null)
   presetSelection.set('detection', 'a809ff23-4235-484f-86f2-e5d87da8333d')
   presetSelection.set('export', null)

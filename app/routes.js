@@ -57,9 +57,9 @@ detectPresetList.set('a809ff23-4235-484f-86f2-e5d87da8333d', {
 exportPresetList.set('1ed8c0c5-a4d9-4e63-a43b-b3bdaddd970f', {
   name: 'Default',
   classes: [
-    {'Class ID':0,'Tag':'Single cells','Crop':'False'},
-    {'Class ID':1,'Tag':'Mating zygotes','Crop':'True'},
-    {'Class ID':2,'Tag':'Budding events','Crop':'True'},
+    {'Class ID':0,'Tag':'Single cell','Crop':'False'},
+    {'Class ID':1,'Tag':'Mating','Crop':'True'},
+    {'Class ID':2,'Tag':'Budding','Crop':'True'},
   ],
   keepID: false,
   boxExpansion: false,

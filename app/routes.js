@@ -93,11 +93,11 @@ if (typeof store.get('export') !== 'undefined') {
 }
 
 if (typeof store.get('backend') !== 'undefined') {
-  for (let [key, value] of Object.entries(store.get('export'))) {
+  for (let [key, value] of Object.entries(store.get('backend'))) {
     backendPresetList.set(key, value)
   }
 }
-
+else {
   backendPresetList.set('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea', {
     name: 'Default',
     localIO: true,
@@ -110,7 +110,7 @@ if (typeof store.get('backend') !== 'undefined') {
     configPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/models/yeastmate.yaml',
     modelPath: remote.getGlobal('resourcesPath') + '/python/YeastMate/models/yeastmate_weights.pth',
   })
-
+}
 
 if (typeof store.get('selection') !== 'undefined') {
   for (let [key, value] of Object.entries(store.get('selection'))) {

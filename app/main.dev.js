@@ -21,6 +21,8 @@ var runCommandTerminalMacOS = require('./callStuffMacOS').runCommandTerminalMacO
 
 let mainWindow = null;
 
+var terminal;
+
 global.resourcesPath = process.resourcesPath;
 
 if (process.env.NODE_ENV === 'production') {
@@ -61,22 +63,46 @@ ipcMain.on('open-file-dialog-for-file', function (event) {
      });
  });
 
+if (os.platform() === 'linux') {
+  var child = exec('echo $XDG_CURRENT_DESKTOP');
+
+  child.stdout.on('data', function (data) {
+    if (data.toUpperCase().includes('GNOME')) {
+      terminal = 'gnome-terminal'
+    }
+    if (data.toUpperCase().includes('UNITY')) {
+      terminal = 'gnome-terminal'
+    }
+    if (data.toUpperCase().includes('KDE')) {
+      terminal = 'konsole'
+    }
+    if (data.toUpperCase().includes('MATE')) {
+      terminal = 'mate-terminal'
+    }
+    if (data.toUpperCase().includes('XFCE')) {
+      terminal = 'xfce4-terminal'
+    }
+    if (data.toUpperCase().includes('PANTHEON')) {
+      terminal = 'pantheon-terminal'
+    }
+    if (data.toUpperCase().includes('CINNAMON')) {
+      terminal = 'x-terminal-emulator'
+    }
+  });
+}
+
 ipcMain.on('start-napari', (event, folder) => {
   if (os.platform() === 'linux') {
-		let an = spawn('gnome-terminal', [
-		'-e',
-		upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation`), 
-    path
-		]);
+    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation`);
+		let anspawn = exec( `${terminal} -e "${exepath} ${folder}"` );
   }
   if (os.platform() === 'darwin') {
-    let an = spawn(upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation`), [
-      path
-    ]);
+    let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation`);
+    let anspawn = runCommandTerminalMacOS(`${exepath} ${folder}`)
   }
   if (os.platform() === 'win32') {
     let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/annotation.exe`);
-    let an = exec(`start /wait "" "${exepath}" ${folder}`);
+    let anspawn = exec(`start /wait "" "${exepath}" ${folder}`);
   }
 })
 
@@ -89,9 +115,6 @@ ipcMain.on('start-io-backend', (event, port) => {
 
     // start linux backends
     if (os.platform() === 'linux') { 
-      
-      let terminal = 'x-terminal-emulator';
-
       let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/hueyserver`);
       let iospawn = exec( `${terminal} -e "${exepath} --port ${port}"` );
     }
@@ -115,9 +138,6 @@ ipcMain.on('start-detection-backend', (event, device, port, config, model) => {
   }
 
   if (os.platform() === 'linux') {     
-
-    let terminal = 'x-terminal-emulator';
-
     let exepath = upath.toUnix(`${process.resourcesPath}/python/YeastMate/yeastmate_server`);
     let decspawn = exec( `${terminal} -e "${exepath} ${deviceSwitch} --port ${port} --config ${config} --model ${model}"` )
   }

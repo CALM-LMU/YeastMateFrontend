@@ -122,7 +122,7 @@ const Dashboard = (props) => {
         let config = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').configPath
         let model = props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').modelPath
 
-        portscanner.findAPortNotInUse(port+1, port+201, '127.0.0.1', function(error, freePort) {
+        portscanner.findAPortNotInUse(port+3, port+203, '127.0.0.1', function(error, freePort) {
           props.props.backend.get('f16dfd0d-39b0-4202-8fec-9ba7d3b0adea').detectionPort = freePort
 
           ipcRenderer.send('start-detection-backend', device, freePort, config, model)
